@@ -1,3 +1,5 @@
+using Malayisha.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,8 +11,16 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // EF Core, Redis, S3, SMS, and external service registration will be added in later tasks.
-        _ = configuration;
+        var connectionString = configuration.GetConnectionString("Malayisha")
+            ?? throw new InvalidOperationException(
+                "Connection string 'Malayisha' was not found. Configure it under ConnectionStrings:Malayisha.");
+
+        services.AddDbContext<MalayishaDbContext>(options =>
+            options.UseNpgsql(connectionString, npgsql =>
+            {
+                npgsql.MigrationsAssembly(typeof(AssemblyMarker).Assembly.FullName);
+            }).UseSnakeCaseNamingConvention());
+
         return services;
     }
 }
