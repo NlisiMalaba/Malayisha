@@ -1,0 +1,136 @@
+# =============================================================================
+# oMalayisha — .gitignore
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Local planning scratch (internal notes — share via docs/ instead)
+# -----------------------------------------------------------------------------
+planning/
+
+# -----------------------------------------------------------------------------
+# Secrets & environment
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pfx
+*.key
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+**/appsettings.*.local.json
+
+# -----------------------------------------------------------------------------
+# Node.js (doc export scripts, frontend tooling)
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+
+# -----------------------------------------------------------------------------
+# Generated documentation exports (regenerate with npm run docs:export)
+# -----------------------------------------------------------------------------
+docs/*.html
+docs/*.pdf
+docs/*.docx
+docs/diagrams/
+
+# Keep source markdown in docs/
+# !docs/*.md
+
+# -----------------------------------------------------------------------------
+# .NET / ASP.NET Core
+# -----------------------------------------------------------------------------
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nupkg
+*.snupkg
+TestResults/
+[Bb]enchmark[Dd]ot[Nn]et.*/
+*.DotSettings.user
+.ionide/
+.fake/
+
+# -----------------------------------------------------------------------------
+# React Native / Expo
+# -----------------------------------------------------------------------------
+.expo/
+dist/
+web-build/
+*.jks
+*.p8
+*.p12
+*.mobileprovision
+*.orig.*
+.metro-health-check*
+ios/Pods/
+ios/build/
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+*.hprof
+.cxx/
+
+# -----------------------------------------------------------------------------
+# Next.js (web / admin)
+# -----------------------------------------------------------------------------
+.next/
+out/
+.vercel/
+
+# -----------------------------------------------------------------------------
+# IDE & editors
+# -----------------------------------------------------------------------------
+.vs/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# -----------------------------------------------------------------------------
+# Infrastructure & Terraform
+# -----------------------------------------------------------------------------
+infra/**/.terraform/
+infra/**/*.tfstate
+infra/**/*.tfstate.*
+infra/**/*.tfvars
+!infra/**/*.tfvars.example
+infra/**/crash.log
+infra/**/override.tf
+infra/**/override.tf.json
+
+# -----------------------------------------------------------------------------
+# Testing, coverage, tooling caches
+# -----------------------------------------------------------------------------
+coverage/
+*.lcov
+.nyc_output/
+.turbo/
+.cache/
+*.log
+
+# -----------------------------------------------------------------------------
+# OS & misc
+# -----------------------------------------------------------------------------
+*.tmp
+*.temp
+*.bak
