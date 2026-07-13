@@ -12,7 +12,7 @@ using StackExchange.Redis;
 
 namespace Malayisha.Infrastructure;
 
-public static class DependencyInjection
+public static partial class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
@@ -20,6 +20,7 @@ public static class DependencyInjection
     {
         AddPostgreSql(services, configuration);
         AddRedis(services, configuration);
+        AddS3(services, configuration);
         return services;
     }
 
