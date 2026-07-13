@@ -21,6 +21,7 @@ public static partial class DependencyInjection
         AddPostgreSql(services, configuration);
         AddRedis(services, configuration);
         AddS3(services, configuration);
+        AddHangfireJobs(services, configuration);
         return services;
     }
 
