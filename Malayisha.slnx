@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Malayisha.Api/Malayisha.Api.csproj" />
+    <Project Path="src/Malayisha.Application/Malayisha.Application.csproj" />
+    <Project Path="src/Malayisha.Domain/Malayisha.Domain.csproj" />
+    <Project Path="src/Malayisha.Infrastructure/Malayisha.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Malayisha.Api.IntegrationTests/Malayisha.Api.IntegrationTests.csproj" />
+    <Project Path="tests/Malayisha.Application.Tests/Malayisha.Application.Tests.csproj" />
+  </Folder>
+</Solution>
