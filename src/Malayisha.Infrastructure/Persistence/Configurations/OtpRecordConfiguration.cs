@@ -28,6 +28,7 @@ internal sealed class OtpRecordConfiguration : IEntityTypeConfiguration<OtpRecor
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
-        builder.HasIndex(record => record.PhoneNumber);
+        builder.HasIndex(record => record.PhoneNumber)
+            .HasDatabaseName("idx_otp_phone");
     }
 }

@@ -29,6 +29,9 @@ internal sealed class ReviewConfiguration : IEntityTypeConfiguration<Review>
         builder.HasIndex(review => review.BookingId)
             .IsUnique();
 
+        builder.HasIndex(review => new { review.TransporterProfileId, review.IsHidden, review.CreatedAtUtc })
+            .HasDatabaseName("idx_review_transporter");
+
         builder.HasOne<Booking>()
             .WithMany()
             .HasForeignKey(review => review.BookingId)

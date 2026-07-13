@@ -64,5 +64,8 @@ internal sealed class BookingConfiguration : IEntityTypeConfiguration<Booking>
             .WithMany()
             .HasForeignKey(booking => booking.CancelledByUserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(booking => new { booking.TransporterId, booking.Status, booking.CreatedAtUtc })
+            .HasDatabaseName("idx_booking_transporter");
     }
 }

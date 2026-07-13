@@ -38,6 +38,9 @@ internal sealed class CommissionRecordConfiguration : IEntityTypeConfiguration<C
         builder.HasIndex(record => record.BookingId)
             .IsUnique();
 
+        builder.HasIndex(record => new { record.Status, record.CompletionDateUtc })
+            .HasDatabaseName("idx_commission_status_date");
+
         builder.HasOne<Booking>()
             .WithMany()
             .HasForeignKey(record => record.BookingId)

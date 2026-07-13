@@ -47,5 +47,9 @@ internal sealed class TripListingConfiguration : IEntityTypeConfiguration<TripLi
             .WithMany()
             .HasForeignKey(trip => trip.TransporterProfileId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(trip => new { trip.OriginCity, trip.DestinationCity, trip.DepartureDateUtc })
+            .HasDatabaseName("idx_trip_search")
+            .HasFilter("is_deleted = false");
     }
 }
