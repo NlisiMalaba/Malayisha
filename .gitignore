@@ -134,3 +134,8 @@ coverage/
 *.tmp
 *.temp
 *.bak
+
+# Keep local Cursor state ignored, but allow shared project rules.
+.cursor/*
+.cursor/rules/
+.cursor/rules/*.mdc
