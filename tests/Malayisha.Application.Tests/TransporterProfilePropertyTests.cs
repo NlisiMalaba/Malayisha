@@ -376,6 +376,11 @@ public sealed class TransporterProfilePropertyTests
         public Task<TransporterProfile?> FindByIdAsync(Guid profileId, CancellationToken cancellationToken = default) =>
             Task.FromResult(_byId.TryGetValue(profileId, out var profile) ? profile : null);
 
+        public Task<TransporterProfile?> FindByIdForUpdateAsync(
+            Guid profileId,
+            CancellationToken cancellationToken = default) =>
+            FindByIdAsync(profileId, cancellationToken);
+
         public Task<TransporterProfile?> FindByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             if (!_idByUserId.TryGetValue(userId, out var profileId))

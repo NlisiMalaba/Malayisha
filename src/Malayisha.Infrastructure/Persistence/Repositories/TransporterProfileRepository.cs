@@ -11,6 +11,12 @@ internal sealed class TransporterProfileRepository(MalayishaDbContext dbContext)
             .AsNoTracking()
             .FirstOrDefaultAsync(profile => profile.Id == profileId, cancellationToken);
 
+    public Task<TransporterProfile?> FindByIdForUpdateAsync(
+        Guid profileId,
+        CancellationToken cancellationToken = default) =>
+        dbContext.TransporterProfiles
+            .FirstOrDefaultAsync(profile => profile.Id == profileId, cancellationToken);
+
     public Task<TransporterProfile?> FindByUserIdAsync(Guid userId, CancellationToken cancellationToken = default) =>
         dbContext.TransporterProfiles
             .FirstOrDefaultAsync(profile => profile.UserId == userId, cancellationToken);
