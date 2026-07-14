@@ -1,5 +1,6 @@
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
+using Malayisha.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +9,7 @@ namespace Malayisha.Application.Features.Verification.ApproveVerification;
 internal sealed class ApproveVerificationCommandHandler(
     IVerificationRepository verificationRepository,
     ITransporterProfileRepository profileRepository,
+    IAuditLogRepository auditLogRepository,
     TimeProvider timeProvider,
     ILogger<ApproveVerificationCommandHandler> logger)
     : IRequestHandler<ApproveVerificationCommand, Result<VerificationResponse>>
@@ -40,7 +42,17 @@ internal sealed class ApproveVerificationCommandHandler(
 
         profile.MarkVerified(nowUtc);
 
-        // Single SaveChanges across tracked verification + profile for atomic commit.
+        await auditLogRepository.AddAsync(
+            AuditLog.Create(
+                Guid.NewGuid(),
+                request.AdminUserId,
+                VerificationAuditActions.Approved,
+                VerificationAuditActions.TargetType,
+                verification.Id,
+                nowUtc),
+            cancellationToken);
+
+        // Single SaveChanges across verification, profile, and audit log for atomic commit.
         await verificationRepository.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation(

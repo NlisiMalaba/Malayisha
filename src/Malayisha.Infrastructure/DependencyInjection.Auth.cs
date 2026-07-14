@@ -20,6 +20,7 @@ public static partial class DependencyInjection
         services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<ITransporterProfileRepository, TransporterProfileRepository>();
         services.AddScoped<IVerificationRepository, VerificationRepository>();
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddSingleton<IOtpHasher, Pbkdf2OtpHasher>();
         services.AddSingleton<IOtpGenerator, SecureOtpGenerator>();
         services.AddSingleton<ITokenService, JwtTokenService>();

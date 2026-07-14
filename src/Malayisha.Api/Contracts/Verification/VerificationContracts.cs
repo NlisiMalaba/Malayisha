@@ -1,8 +1,10 @@
 using Malayisha.Domain.Enums;
 
-namespace Malayisha.Application.Features.Verification;
+namespace Malayisha.Api.Contracts.Verification;
 
-public sealed record VerificationResponse(
+public sealed record RejectVerificationRequest(string? RejectionReason = null);
+
+public sealed record VerificationDto(
     Guid Id,
     Guid TransporterProfileId,
     VerificationStatus Status,
@@ -11,7 +13,7 @@ public sealed record VerificationResponse(
     DateTime? ReviewedAtUtc,
     string? RejectionReason);
 
-public sealed record PendingVerificationProfileResponse(
+public sealed record PendingVerificationProfileDto(
     Guid Id,
     string DisplayName,
     IReadOnlyList<string> RoutesServed,
@@ -21,7 +23,7 @@ public sealed record PendingVerificationProfileResponse(
     bool IsVerified,
     decimal AverageRating);
 
-public sealed record PendingVerificationResponse(
+public sealed record PendingVerificationDto(
     Guid Id,
     DateTime SubmittedAtUtc,
-    PendingVerificationProfileResponse Profile);
+    PendingVerificationProfileDto Profile);

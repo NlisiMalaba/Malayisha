@@ -381,6 +381,18 @@ public sealed class TransporterProfilePropertyTests
             CancellationToken cancellationToken = default) =>
             FindByIdAsync(profileId, cancellationToken);
 
+        public Task<IReadOnlyDictionary<Guid, TransporterProfile>> FindByIdsAsync(
+            IEnumerable<Guid> profileIds,
+            CancellationToken cancellationToken = default)
+        {
+            var profiles = profileIds
+                .Distinct()
+                .Where(id => _byId.ContainsKey(id))
+                .ToDictionary(id => id, id => _byId[id]);
+
+            return Task.FromResult<IReadOnlyDictionary<Guid, TransporterProfile>>(profiles);
+        }
+
         public Task<TransporterProfile?> FindByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             if (!_idByUserId.TryGetValue(userId, out var profileId))

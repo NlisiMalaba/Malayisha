@@ -8,6 +8,10 @@ public interface ITransporterProfileRepository
 
     Task<TransporterProfile?> FindByIdForUpdateAsync(Guid profileId, CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyDictionary<Guid, TransporterProfile>> FindByIdsAsync(
+        IEnumerable<Guid> profileIds,
+        CancellationToken cancellationToken = default);
+
     Task<TransporterProfile?> FindByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     Task<bool> ExistsForUserAsync(Guid userId, CancellationToken cancellationToken = default);

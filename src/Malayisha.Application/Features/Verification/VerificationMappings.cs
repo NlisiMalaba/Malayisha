@@ -14,6 +14,19 @@ internal static class VerificationMappings
             verification.ReviewedAtUtc,
             verification.RejectionReason);
 
-    public static PendingVerificationResponse ToPendingResponse(Domain.Entities.Verification verification) =>
-        new(verification.Id, verification.TransporterProfileId, verification.SubmittedAtUtc);
+    public static PendingVerificationResponse ToPendingResponse(
+        Domain.Entities.Verification verification,
+        TransporterProfile profile) =>
+        new(
+            verification.Id,
+            verification.SubmittedAtUtc,
+            new PendingVerificationProfileResponse(
+                profile.Id,
+                profile.DisplayName,
+                profile.RoutesServed,
+                profile.VehicleDescription,
+                profile.CapacityKg,
+                profile.ProfilePhotoUrl,
+                profile.IsVerified,
+                profile.AverageRating));
 }
