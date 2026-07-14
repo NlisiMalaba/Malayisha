@@ -22,6 +22,8 @@ public static partial class DependencyInjection
         AddRedis(services, configuration);
         AddS3(services, configuration);
         AddHangfireJobs(services, configuration);
+        AddAuthServices(services, configuration);
+        AddNotifications(services, configuration);
         return services;
     }
 

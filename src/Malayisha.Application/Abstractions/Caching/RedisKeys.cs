@@ -8,6 +8,8 @@ public static class RedisKeys
 
     public static string OtpAttempts(string phoneNumber) => $"otp:attempts:{phoneNumber}";
 
+    public static string OtpSendRate(string phoneNumber) => $"otp:send:{phoneNumber}";
+
     public static string RefreshToken(string tokenHash) => $"refresh:{tokenHash}";
 
     public static string TripSearch(string cacheKey) => $"trip:search:{cacheKey}";

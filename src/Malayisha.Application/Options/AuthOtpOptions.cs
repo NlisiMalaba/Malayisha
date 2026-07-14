@@ -1,14 +1,8 @@
-using Malayisha.Application.Options;
+namespace Malayisha.Application.Options;
 
-namespace Malayisha.Infrastructure.Options;
-
-public sealed class RedisOptions
+public sealed class AuthOtpOptions
 {
     public const string SectionName = "Redis";
-
-    public string ConnectionString { get; set; } = "localhost:6379";
-
-    public int DefaultCacheTtlSeconds { get; set; } = 60;
 
     public int OtpTtlSeconds { get; set; } = 300;
 
