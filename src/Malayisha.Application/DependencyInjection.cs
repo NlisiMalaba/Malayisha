@@ -16,6 +16,7 @@ public static class DependencyInjection
     {
         services.Configure<AuthOtpOptions>(configuration.GetSection(AuthOtpOptions.SectionName));
         services.Configure<SmsTemplateOptions>(configuration.GetSection(SmsTemplateOptions.SectionName));
+        services.Configure<AppLinkOptions>(configuration.GetSection(AppLinkOptions.SectionName));
 
         services.AddMediatR(config =>
         {

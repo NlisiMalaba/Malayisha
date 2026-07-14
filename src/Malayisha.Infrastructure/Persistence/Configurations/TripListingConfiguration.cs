@@ -35,6 +35,12 @@ internal sealed class TripListingConfiguration : IEntityTypeConfiguration<TripLi
         builder.Property(trip => trip.Description)
             .HasMaxLength(2000);
 
+        builder.Property(trip => trip.BoostStartAtUtc)
+            .HasColumnType("timestamp with time zone");
+
+        builder.Property(trip => trip.BoostEndAtUtc)
+            .HasColumnType("timestamp with time zone");
+
         builder.Property(trip => trip.CreatedAtUtc)
             .HasColumnType("timestamp with time zone")
             .IsRequired();
@@ -48,8 +54,15 @@ internal sealed class TripListingConfiguration : IEntityTypeConfiguration<TripLi
             .HasForeignKey(trip => trip.TransporterProfileId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(trip => new { trip.OriginCity, trip.DestinationCity, trip.DepartureDateUtc })
+        builder.HasIndex(trip => new
+            {
+                trip.OriginCity,
+                trip.DestinationCity,
+                trip.DepartureDateUtc,
+                trip.IsBoosted
+            })
             .HasDatabaseName("idx_trip_search")
-            .HasFilter("is_deleted = false");
+            .HasFilter("is_deleted = false")
+            .IsDescending(false, false, false, true);
     }
 }
