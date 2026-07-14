@@ -1,27 +1,14 @@
 using System.Net;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 
 namespace Malayisha.Api.IntegrationTests;
 
-public sealed class HealthEndpointTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class HealthEndpointTests : IClassFixture<MalayishaWebApplicationFactory>
 {
     private readonly HttpClient _client;
 
-    public HealthEndpointTests(WebApplicationFactory<Program> factory)
-    {
-        _client = factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureAppConfiguration((_, config) =>
-            {
-                config.AddInMemoryCollection(new Dictionary<string, string?>
-                {
-                    ["Hangfire:Enabled"] = "false"
-                });
-            });
-        }).CreateClient();
-    }
+    public HealthEndpointTests(MalayishaWebApplicationFactory factory) =>
+        _client = factory.CreateClient();
 
     [Fact]
     public async Task GetHealth_ReturnsOk()

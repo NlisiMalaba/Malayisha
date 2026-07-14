@@ -63,7 +63,7 @@ internal sealed class SendOtpCommandHandler(
         logger.LogInformation(
             "OTP dispatched for {Purpose} to phone ending {PhoneSuffix}",
             request.Purpose,
-            request.PhoneNumber[^4..]);
+            request.PhoneNumber.Length >= 4 ? request.PhoneNumber[^4..] : "****");
 
         return Result.Success();
     }
