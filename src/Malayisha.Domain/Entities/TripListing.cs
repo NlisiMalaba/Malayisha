@@ -35,6 +35,9 @@ public sealed class TripListing
     public decimal AvailableCapacityKg { get; private set; }
     public decimal PriceGuideZar { get; private set; }
     public string? Description { get; private set; }
+    public bool IsBoosted { get; private set; }
+    public DateTime? BoostStartAtUtc { get; private set; }
+    public DateTime? BoostEndAtUtc { get; private set; }
     public bool IsDeleted { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
     public DateTime UpdatedAtUtc { get; private set; }
@@ -81,6 +84,32 @@ public sealed class TripListing
     public void MarkDeleted(DateTime nowUtc)
     {
         IsDeleted = true;
+        UpdatedAtUtc = nowUtc;
+    }
+
+    public void ApplyBoost(DateTime startAtUtc, DateTime endAtUtc, DateTime nowUtc)
+    {
+        if (endAtUtc <= startAtUtc)
+        {
+            throw new ArgumentException("Boost end must be after boost start.", nameof(endAtUtc));
+        }
+
+        IsBoosted = true;
+        BoostStartAtUtc = startAtUtc;
+        BoostEndAtUtc = endAtUtc;
+        UpdatedAtUtc = nowUtc;
+    }
+
+    public void ClearBoost(DateTime nowUtc)
+    {
+        if (!IsBoosted)
+        {
+            return;
+        }
+
+        IsBoosted = false;
+        BoostStartAtUtc = null;
+        BoostEndAtUtc = null;
         UpdatedAtUtc = nowUtc;
     }
 
