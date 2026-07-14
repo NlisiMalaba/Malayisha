@@ -8,21 +8,26 @@ public sealed class TransporterProfile
         Guid id,
         Guid userId,
         string displayName,
+        IEnumerable<string> routesServed,
         string vehicleDescription,
         decimal capacityKg,
+        string? profilePhotoUrl,
         DateTime createdAtUtc)
     {
         Id = id;
         UserId = userId;
         DisplayName = DomainGuard.Required(displayName, nameof(displayName));
+        RoutesServed = NormalizeRoutes(routesServed);
         VehicleDescription = DomainGuard.Required(vehicleDescription, nameof(vehicleDescription));
         CapacityKg = DomainGuard.Positive(capacityKg, nameof(capacityKg));
+        ProfilePhotoUrl = NormalizeOptionalUrl(profilePhotoUrl);
         CreatedAtUtc = createdAtUtc;
     }
 
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
     public string DisplayName { get; private set; } = string.Empty;
+    public List<string> RoutesServed { get; private set; } = [];
     public string VehicleDescription { get; private set; } = string.Empty;
     public decimal CapacityKg { get; private set; }
     public string? ProfilePhotoUrl { get; private set; }
@@ -35,22 +40,30 @@ public sealed class TransporterProfile
         Guid id,
         Guid userId,
         string displayName,
+        IEnumerable<string> routesServed,
         string vehicleDescription,
         decimal capacityKg,
-        DateTime nowUtc) =>
-        new(id, userId, displayName, vehicleDescription, capacityKg, nowUtc);
+        DateTime nowUtc,
+        string? profilePhotoUrl = null) =>
+        new(id, userId, displayName, routesServed, vehicleDescription, capacityKg, profilePhotoUrl, nowUtc);
 
     public void Update(
         string displayName,
+        IEnumerable<string> routesServed,
         string vehicleDescription,
         decimal capacityKg,
-        string? profilePhotoUrl,
         DateTime nowUtc)
     {
         DisplayName = DomainGuard.Required(displayName, nameof(displayName));
+        RoutesServed = NormalizeRoutes(routesServed);
         VehicleDescription = DomainGuard.Required(vehicleDescription, nameof(vehicleDescription));
         CapacityKg = DomainGuard.Positive(capacityKg, nameof(capacityKg));
-        ProfilePhotoUrl = profilePhotoUrl;
+        UpdatedAtUtc = nowUtc;
+    }
+
+    public void SetProfilePhotoUrl(string profilePhotoUrl, DateTime nowUtc)
+    {
+        ProfilePhotoUrl = DomainGuard.Required(profilePhotoUrl, nameof(profilePhotoUrl));
         UpdatedAtUtc = nowUtc;
     }
 
@@ -65,4 +78,24 @@ public sealed class TransporterProfile
         AverageRating = averageRating < 0 ? 0 : averageRating;
         UpdatedAtUtc = nowUtc;
     }
+
+    private static List<string> NormalizeRoutes(IEnumerable<string> routesServed)
+    {
+        ArgumentNullException.ThrowIfNull(routesServed);
+
+        var normalized = routesServed
+            .Select(route => DomainGuard.Required(route, nameof(routesServed)))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (normalized.Count == 0)
+        {
+            throw new ArgumentException("At least one route is required.", nameof(routesServed));
+        }
+
+        return normalized;
+    }
+
+    private static string? NormalizeOptionalUrl(string? profilePhotoUrl) =>
+        string.IsNullOrWhiteSpace(profilePhotoUrl) ? null : profilePhotoUrl.Trim();
 }

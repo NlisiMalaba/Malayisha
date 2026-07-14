@@ -16,6 +16,10 @@ internal sealed class TransporterProfileConfiguration : IEntityTypeConfiguration
             .HasMaxLength(120)
             .IsRequired();
 
+        builder.Property(profile => profile.RoutesServed)
+            .HasColumnType("jsonb")
+            .IsRequired();
+
         builder.Property(profile => profile.VehicleDescription)
             .HasMaxLength(500)
             .IsRequired();
