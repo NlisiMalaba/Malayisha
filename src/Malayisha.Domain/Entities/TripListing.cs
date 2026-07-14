@@ -12,6 +12,7 @@ public sealed class TripListing
         DateTime departureDateUtc,
         decimal availableCapacityKg,
         decimal priceGuideZar,
+        string? description,
         DateTime createdAtUtc)
     {
         Id = id;
@@ -21,7 +22,9 @@ public sealed class TripListing
         DepartureDateUtc = departureDateUtc;
         AvailableCapacityKg = DomainGuard.Positive(availableCapacityKg, nameof(availableCapacityKg));
         PriceGuideZar = DomainGuard.Positive(priceGuideZar, nameof(priceGuideZar));
+        Description = NormalizeDescription(description);
         CreatedAtUtc = createdAtUtc;
+        UpdatedAtUtc = createdAtUtc;
     }
 
     public Guid Id { get; private set; }
@@ -44,8 +47,18 @@ public sealed class TripListing
         DateTime departureDateUtc,
         decimal availableCapacityKg,
         decimal priceGuideZar,
-        DateTime nowUtc) =>
-        new(id, transporterProfileId, originCity, destinationCity, departureDateUtc, availableCapacityKg, priceGuideZar, nowUtc);
+        DateTime nowUtc,
+        string? description = null) =>
+        new(
+            id,
+            transporterProfileId,
+            originCity,
+            destinationCity,
+            departureDateUtc,
+            availableCapacityKg,
+            priceGuideZar,
+            description,
+            nowUtc);
 
     public void Update(
         string originCity,
@@ -61,7 +74,7 @@ public sealed class TripListing
         DepartureDateUtc = departureDateUtc;
         AvailableCapacityKg = DomainGuard.Positive(availableCapacityKg, nameof(availableCapacityKg));
         PriceGuideZar = DomainGuard.Positive(priceGuideZar, nameof(priceGuideZar));
-        Description = description;
+        Description = NormalizeDescription(description);
         UpdatedAtUtc = nowUtc;
     }
 
@@ -69,5 +82,15 @@ public sealed class TripListing
     {
         IsDeleted = true;
         UpdatedAtUtc = nowUtc;
+    }
+
+    private static string? NormalizeDescription(string? description)
+    {
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            return null;
+        }
+
+        return description.Trim();
     }
 }
