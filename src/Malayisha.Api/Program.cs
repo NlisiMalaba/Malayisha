@@ -1,3 +1,4 @@
+using Malayisha.Api;
 using Malayisha.Api.Filters;
 using Malayisha.Application;
 using Malayisha.Infrastructure;
@@ -16,6 +17,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddOpenApi();
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApiAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
@@ -25,6 +27,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseHangfireJobs();
 app.MapControllers();
