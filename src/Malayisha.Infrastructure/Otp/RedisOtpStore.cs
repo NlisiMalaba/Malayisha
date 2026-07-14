@@ -67,4 +67,21 @@ internal sealed class RedisOtpStore(IConnectionMultiplexer connectionMultiplexer
 
     public async Task<bool> IsLockedOutAsync(string phoneNumber, CancellationToken cancellationToken = default) =>
         await _database.KeyExistsAsync(RedisKeys.OtpLockout(phoneNumber)).WaitAsync(cancellationToken);
+
+    public async Task<bool> TryRecordSendAsync(
+        string phoneNumber,
+        int maxSends,
+        TimeSpan window,
+        CancellationToken cancellationToken = default)
+    {
+        var key = (RedisKey)RedisKeys.OtpSendRate(phoneNumber);
+        var count = await _database.StringIncrementAsync(key).WaitAsync(cancellationToken);
+
+        if (count == 1)
+        {
+            await _database.KeyExpireAsync(key, window).WaitAsync(cancellationToken);
+        }
+
+        return count <= maxSends;
+    }
 }

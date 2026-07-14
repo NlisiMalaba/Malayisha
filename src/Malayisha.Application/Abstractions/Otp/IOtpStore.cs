@@ -27,4 +27,10 @@ public interface IOtpStore
         CancellationToken cancellationToken = default);
 
     Task<bool> IsLockedOutAsync(string phoneNumber, CancellationToken cancellationToken = default);
+
+    Task<bool> TryRecordSendAsync(
+        string phoneNumber,
+        int maxSends,
+        TimeSpan window,
+        CancellationToken cancellationToken = default);
 }

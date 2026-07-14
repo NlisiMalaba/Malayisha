@@ -1,14 +1,12 @@
 using System.Security.Cryptography;
 using System.Text;
 using Malayisha.Application.Abstractions.Otp;
+using Malayisha.Application.Options;
 
 namespace Malayisha.Infrastructure.Otp;
 
 internal sealed class Pbkdf2OtpHasher : IOtpHasher
 {
-    private const int SaltSize = 16;
-    private const int HashSize = 32;
-    private const int Iterations = 100_000;
     private static readonly HashAlgorithmName Algorithm = HashAlgorithmName.SHA256;
 
     public string Hash(string phoneNumber, string otpCode)
@@ -17,9 +15,9 @@ internal sealed class Pbkdf2OtpHasher : IOtpHasher
         var hash = Rfc2898DeriveBytes.Pbkdf2(
             otpCode,
             salt,
-            Iterations,
+            OtpSecurityConstants.Pbkdf2Iterations,
             Algorithm,
-            HashSize);
+            OtpSecurityConstants.Pbkdf2HashSizeBytes);
 
         return Convert.ToBase64String(hash);
     }
@@ -30,10 +28,15 @@ internal sealed class Pbkdf2OtpHasher : IOtpHasher
         var expectedHash = Convert.FromBase64String(otpHash);
 
         return CryptographicOperations.FixedTimeEquals(
-            Rfc2898DeriveBytes.Pbkdf2(otpCode, salt, Iterations, Algorithm, expectedHash.Length),
+            Rfc2898DeriveBytes.Pbkdf2(
+                otpCode,
+                salt,
+                OtpSecurityConstants.Pbkdf2Iterations,
+                Algorithm,
+                expectedHash.Length),
             expectedHash);
     }
 
     private static byte[] CreateSalt(string phoneNumber) =>
-        SHA256.HashData(Encoding.UTF8.GetBytes(phoneNumber))[..SaltSize];
+        SHA256.HashData(Encoding.UTF8.GetBytes(phoneNumber))[..OtpSecurityConstants.Pbkdf2SaltSizeBytes];
 }

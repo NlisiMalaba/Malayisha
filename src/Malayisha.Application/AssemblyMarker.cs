@@ -1,3 +1,7 @@
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Malayisha.Application.Tests")]
+
 namespace Malayisha.Application;
 
 /// <summary>

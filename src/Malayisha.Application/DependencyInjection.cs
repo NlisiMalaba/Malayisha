@@ -1,5 +1,6 @@
 using FluentValidation;
 using Malayisha.Application.Behaviors;
+using Malayisha.Application.Features.Auth.Otp;
 using Malayisha.Application.Options;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,8 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(typeof(AssemblyMarker).Assembly);
+
+        services.AddSingleton<IOtpSecurityService, OtpSecurityService>();
 
         return services;
     }

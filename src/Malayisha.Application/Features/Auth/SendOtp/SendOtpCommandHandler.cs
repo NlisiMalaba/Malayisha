@@ -1,6 +1,7 @@
 using Malayisha.Application.Abstractions.Notifications;
 using Malayisha.Application.Abstractions.Otp;
 using Malayisha.Application.Abstractions.Persistence;
+using Malayisha.Application.Features.Auth.Otp;
 using Malayisha.Application.Options;
 using Malayisha.Domain.Common;
 using MediatR;
@@ -13,6 +14,7 @@ internal sealed class SendOtpCommandHandler(
     IOtpStore otpStore,
     IOtpHasher otpHasher,
     IOtpGenerator otpGenerator,
+    IOtpSecurityService otpSecurityService,
     INotificationService notificationService,
     IAuthRepository authRepository,
     IOptions<AuthOtpOptions> otpOptions,
@@ -21,9 +23,10 @@ internal sealed class SendOtpCommandHandler(
 {
     public async Task<Result> Handle(SendOtpCommand request, CancellationToken cancellationToken)
     {
-        if (await otpStore.IsLockedOutAsync(request.PhoneNumber, cancellationToken))
+        var securityError = await otpSecurityService.TryRecordSendAsync(request.PhoneNumber, cancellationToken);
+        if (securityError is not null)
         {
-            return Result.Error(AuthErrorCodes.PhoneLockedOut);
+            return Result.Error(securityError);
         }
 
         var existingUser = await authRepository.FindUserByPhoneAsync(request.PhoneNumber, cancellationToken);

@@ -13,4 +13,5 @@ public static class AuthErrorCodes
     public const string RefreshTokenExpired = "RefreshTokenExpired";
     public const string RefreshTokenRevoked = "RefreshTokenRevoked";
     public const string RefreshTokenAlreadyUsed = "RefreshTokenAlreadyUsed";
+    public const string OtpSendRateLimited = "OtpSendRateLimited";
 }

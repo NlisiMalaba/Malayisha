@@ -2,6 +2,7 @@ using Malayisha.Application.Abstractions.Auth;
 using Malayisha.Application.Abstractions.Otp;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
+using Malayisha.Application.Features.Auth.Otp;
 using Malayisha.Application.Options;
 using Malayisha.Domain.Entities;
 using MediatR;
@@ -13,6 +14,7 @@ namespace Malayisha.Application.Features.Auth.VerifyOtp;
 internal sealed class VerifyOtpCommandHandler(
     IOtpStore otpStore,
     IOtpHasher otpHasher,
+    IOtpSecurityService otpSecurityService,
     IAuthRepository authRepository,
     ITokenService tokenService,
     TimeProvider timeProvider,
@@ -23,9 +25,10 @@ internal sealed class VerifyOtpCommandHandler(
         VerifyOtpCommand request,
         CancellationToken cancellationToken)
     {
-        if (await otpStore.IsLockedOutAsync(request.PhoneNumber, cancellationToken))
+        var lockoutError = await otpSecurityService.GetLockoutErrorAsync(request.PhoneNumber, cancellationToken);
+        if (lockoutError is not null)
         {
-            return Result<AuthSessionResponse>.Error(AuthErrorCodes.PhoneLockedOut);
+            return Result<AuthSessionResponse>.Error(lockoutError);
         }
 
         var storedHash = await otpStore.GetHashAsync(request.PhoneNumber, cancellationToken);
@@ -36,7 +39,11 @@ internal sealed class VerifyOtpCommandHandler(
 
         if (!otpHasher.Verify(request.PhoneNumber, request.OtpCode, storedHash))
         {
-            return await HandleInvalidOtpAsync(request.PhoneNumber, cancellationToken);
+            var verificationError = await otpSecurityService.RecordFailedVerificationAsync(
+                request.PhoneNumber,
+                cancellationToken);
+
+            return Result<AuthSessionResponse>.Error(verificationError!);
         }
 
         var nowUtc = timeProvider.GetUtcNow().UtcDateTime;
@@ -105,25 +112,6 @@ internal sealed class VerifyOtpCommandHandler(
         }
 
         return Result<User>.Success(existingUser);
-    }
-
-    private async Task<Result<AuthSessionResponse>> HandleInvalidOtpAsync(
-        string phoneNumber,
-        CancellationToken cancellationToken)
-    {
-        var lockoutWindow = TimeSpan.FromSeconds(otpOptions.Value.LockoutDurationSeconds);
-        var attempts = await otpStore.IncrementAttemptCountAsync(
-            phoneNumber,
-            lockoutWindow,
-            cancellationToken);
-
-        if (attempts >= otpOptions.Value.MaxOtpAttempts)
-        {
-            await otpStore.SetLockoutAsync(phoneNumber, lockoutWindow, cancellationToken);
-            return Result<AuthSessionResponse>.Error(AuthErrorCodes.PhoneLockedOut);
-        }
-
-        return Result<AuthSessionResponse>.Error(AuthErrorCodes.InvalidOtp);
     }
 
     private async Task<AuthSessionResponse> IssueSessionAsync(
