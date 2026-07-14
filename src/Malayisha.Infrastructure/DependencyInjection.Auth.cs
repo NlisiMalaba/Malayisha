@@ -18,6 +18,7 @@ public static partial class DependencyInjection
 
         services.AddSingleton<TimeProvider>(TimeProvider.System);
         services.AddScoped<IAuthRepository, AuthRepository>();
+        services.AddScoped<ITransporterProfileRepository, TransporterProfileRepository>();
         services.AddSingleton<IOtpHasher, Pbkdf2OtpHasher>();
         services.AddSingleton<IOtpGenerator, SecureOtpGenerator>();
         services.AddSingleton<ITokenService, JwtTokenService>();
