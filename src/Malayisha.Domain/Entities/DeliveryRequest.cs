@@ -26,6 +26,7 @@ public sealed class DeliveryRequest
         SizeDescription = DomainGuard.Required(sizeDescription, nameof(sizeDescription));
         GoodsDescription = DomainGuard.Required(goodsDescription, nameof(goodsDescription));
         CreatedAtUtc = createdAtUtc;
+        UpdatedAtUtc = createdAtUtc;
     }
 
     public Guid Id { get; private set; }
@@ -52,9 +53,33 @@ public sealed class DeliveryRequest
         DateTime nowUtc) =>
         new(id, senderId, originCity, destinationCity, requiredDateUtc, weightKg, sizeDescription, goodsDescription, nowUtc);
 
+    public void Update(
+        string originCity,
+        string destinationCity,
+        DateTime requiredDateUtc,
+        decimal weightKg,
+        string sizeDescription,
+        string goodsDescription,
+        DateTime nowUtc)
+    {
+        OriginCity = DomainGuard.Required(originCity, nameof(originCity));
+        DestinationCity = DomainGuard.Required(destinationCity, nameof(destinationCity));
+        RequiredDateUtc = requiredDateUtc;
+        WeightKg = DomainGuard.Positive(weightKg, nameof(weightKg));
+        SizeDescription = DomainGuard.Required(sizeDescription, nameof(sizeDescription));
+        GoodsDescription = DomainGuard.Required(goodsDescription, nameof(goodsDescription));
+        UpdatedAtUtc = nowUtc;
+    }
+
     public void MarkCancelled(DateTime nowUtc)
     {
         Status = DeliveryRequestStatus.Cancelled;
+        UpdatedAtUtc = nowUtc;
+    }
+
+    public void MarkConvertedToBooking(DateTime nowUtc)
+    {
+        Status = DeliveryRequestStatus.ConvertedToBooking;
         UpdatedAtUtc = nowUtc;
     }
 }

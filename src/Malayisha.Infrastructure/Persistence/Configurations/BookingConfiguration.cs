@@ -50,6 +50,16 @@ internal sealed class BookingConfiguration : IEntityTypeConfiguration<Booking>
             .HasForeignKey(booking => booking.TripListingId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne<DeliveryRequest>()
+            .WithMany()
+            .HasForeignKey(booking => booking.DeliveryRequestId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(booking => booking.DeliveryRequestId)
+            .IsUnique()
+            .HasFilter("delivery_request_id IS NOT NULL")
+            .HasDatabaseName("ix_bookings_delivery_request_id");
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(booking => booking.SenderId)

@@ -15,10 +15,12 @@ public sealed class Booking
         Guid senderId,
         Guid transporterId,
         DateTime createdAtUtc,
-        string? message)
+        string? message,
+        Guid? deliveryRequestId)
     {
         Id = id;
         TripListingId = tripListingId;
+        DeliveryRequestId = deliveryRequestId;
         SenderId = senderId;
         TransporterId = transporterId;
         Message = message;
@@ -27,6 +29,7 @@ public sealed class Booking
 
     public Guid Id { get; private set; }
     public Guid TripListingId { get; private set; }
+    public Guid? DeliveryRequestId { get; private set; }
     public Guid SenderId { get; private set; }
     public Guid TransporterId { get; private set; }
     public BookingStatus Status { get; private set; } = BookingStatus.Requested;
@@ -47,8 +50,9 @@ public sealed class Booking
         Guid senderId,
         Guid transporterId,
         DateTime nowUtc,
-        string? message = null) =>
-        new(id, tripListingId, senderId, transporterId, nowUtc, message);
+        string? message = null,
+        Guid? deliveryRequestId = null) =>
+        new(id, tripListingId, senderId, transporterId, nowUtc, message, deliveryRequestId);
 
     public Result Transition(
         BookingStatus targetStatus,
