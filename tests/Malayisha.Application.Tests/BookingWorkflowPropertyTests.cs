@@ -211,6 +211,20 @@ public sealed class BookingWorkflowPropertyTests
         public Task<Booking?> FindByIdAsync(Guid bookingId, CancellationToken cancellationToken = default) =>
             Task.FromResult(_bookings.TryGetValue(bookingId, out var booking) ? booking : null);
 
+        public Task<IReadOnlyList<Booking>> ListActiveByParticipantAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default)
+        {
+            var items = _bookings.Values
+                .Where(booking =>
+                    (booking.SenderId == userId || booking.TransporterId == userId)
+                    && booking.Status != BookingStatus.Completed
+                    && booking.Status != BookingStatus.Cancelled)
+                .ToArray();
+
+            return Task.FromResult<IReadOnlyList<Booking>>(items);
+        }
+
         public Task<IReadOnlyList<Booking>> ListDeliveredBeforeAsync(
             DateTime deliveredBeforeUtc,
             CancellationToken cancellationToken = default)

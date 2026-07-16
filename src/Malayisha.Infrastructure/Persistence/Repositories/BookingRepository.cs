@@ -10,6 +10,16 @@ internal sealed class BookingRepository(MalayishaDbContext dbContext) : IBooking
     public Task<Booking?> FindByIdAsync(Guid bookingId, CancellationToken cancellationToken = default) =>
         dbContext.Bookings.FirstOrDefaultAsync(booking => booking.Id == bookingId, cancellationToken);
 
+    public async Task<IReadOnlyList<Booking>> ListActiveByParticipantAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default) =>
+        await dbContext.Bookings
+            .Where(booking =>
+                (booking.SenderId == userId || booking.TransporterId == userId)
+                && booking.Status != BookingStatus.Completed
+                && booking.Status != BookingStatus.Cancelled)
+            .ToListAsync(cancellationToken);
+
     public async Task<IReadOnlyList<Booking>> ListDeliveredBeforeAsync(
         DateTime deliveredBeforeUtc,
         CancellationToken cancellationToken = default) =>

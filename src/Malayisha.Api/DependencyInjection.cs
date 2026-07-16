@@ -1,11 +1,14 @@
 using System.Text;
 using Malayisha.Api.Authorization;
+using Malayisha.Api.Chat;
+using Malayisha.Application.Abstractions.Chat;
 using Malayisha.Domain.Enums;
 using Malayisha.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace Malayisha.Api;
 
@@ -40,6 +43,23 @@ public static class DependencyInjection
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
                     ClockSkew = TimeSpan.FromMinutes(1)
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken)
+                            && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         services.AddAuthorization(options =>
@@ -61,6 +81,28 @@ public static class DependencyInjection
             options.AddPolicy(AuthPolicies.Authenticated, policy =>
                 policy.RequireAuthenticatedUser());
         });
+
+        return services;
+    }
+
+    public static IServiceCollection AddApiSignalR(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddSingleton<IChatNotifier, SignalRChatNotifier>();
+
+        var redisConnectionString = configuration.GetSection(RedisOptions.SectionName)
+            .Get<RedisOptions>()?.ConnectionString;
+
+        var signalRBuilder = services.AddSignalR();
+
+        if (!string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            signalRBuilder.AddStackExchangeRedis(redisConnectionString, options =>
+            {
+                options.Configuration.ChannelPrefix = RedisChannel.Literal("Malayisha");
+            });
+        }
 
         return services;
     }

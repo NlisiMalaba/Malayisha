@@ -20,6 +20,12 @@ internal sealed class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMe
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
+        builder.Property(message => message.IsDelivered)
+            .IsRequired();
+
+        builder.HasIndex(message => new { message.BookingId, message.IsDelivered })
+            .HasDatabaseName("idx_chat_messages_booking_undelivered");
+
         builder.HasOne<Booking>()
             .WithMany()
             .HasForeignKey(message => message.BookingId)

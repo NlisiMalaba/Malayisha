@@ -1,5 +1,6 @@
 using Malayisha.Api;
 using Malayisha.Api.Filters;
+using Malayisha.Api.Hubs;
 using Malayisha.Application;
 using Malayisha.Infrastructure;
 using System.Text.Json.Serialization;
@@ -18,6 +19,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApiAuthentication(builder.Configuration);
+builder.Services.AddApiSignalR(builder.Configuration);
 
 var app = builder.Build();
 
@@ -31,6 +33,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHangfireJobs();
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();
 
