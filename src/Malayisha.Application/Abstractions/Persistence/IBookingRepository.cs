@@ -6,6 +6,10 @@ public interface IBookingRepository
 {
     Task<Booking?> FindByIdAsync(Guid bookingId, CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<Booking>> ListActiveByParticipantAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<Booking>> ListDeliveredBeforeAsync(
         DateTime deliveredBeforeUtc,
         CancellationToken cancellationToken = default);
