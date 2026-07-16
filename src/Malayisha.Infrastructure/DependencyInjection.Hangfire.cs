@@ -16,6 +16,7 @@ public static partial class DependencyInjection
     private static void AddHangfireJobs(IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<HangfireOptions>(configuration.GetSection(HangfireOptions.SectionName));
+        services.Configure<BookingWorkflowOptions>(configuration.GetSection(BookingWorkflowOptions.SectionName));
 
         var hangfireOptions = configuration.GetSection(HangfireOptions.SectionName).Get<HangfireOptions>()
             ?? new HangfireOptions();

@@ -24,6 +24,7 @@ public static partial class DependencyInjection
         services.AddScoped<ITripListingRepository, TripListingRepository>();
         services.AddScoped<IDeliveryRequestRepository, DeliveryRequestRepository>();
         services.AddScoped<IBookingRepository, BookingRepository>();
+        services.AddScoped<ICommissionRecordRepository, CommissionRecordRepository>();
         services.AddSingleton<IOtpHasher, Pbkdf2OtpHasher>();
         services.AddSingleton<IOtpGenerator, SecureOtpGenerator>();
         services.AddSingleton<ITokenService, JwtTokenService>();
