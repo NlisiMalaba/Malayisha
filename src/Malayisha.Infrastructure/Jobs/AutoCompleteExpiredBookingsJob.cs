@@ -4,7 +4,6 @@ using Malayisha.Application.Features.Booking.CompleteBooking;
 using Malayisha.Domain.Entities;
 using Malayisha.Domain.Enums;
 using Malayisha.Infrastructure.Options;
-using Malayisha.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,7 +13,6 @@ namespace Malayisha.Infrastructure.Jobs;
 internal sealed class AutoCompleteExpiredBookingsJob(
     IBookingRepository bookingRepository,
     ICommissionRecordRepository commissionRecordRepository,
-    MalayishaDbContext dbContext,
     IMediator mediator,
     TimeProvider timeProvider,
     IOptions<BookingWorkflowOptions> bookingWorkflowOptions,
@@ -65,7 +63,6 @@ internal sealed class AutoCompleteExpiredBookingsJob(
                 continue;
             }
 
-            await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
             var completionResult = await mediator.Send(
                 new CompleteBookingCommand(
                     SystemActorId,
@@ -80,14 +77,12 @@ internal sealed class AutoCompleteExpiredBookingsJob(
                     "Failed to auto-complete booking {BookingId}; error {ErrorCode}",
                     booking.Id,
                     completionResult.ErrorCode);
-                await transaction.RollbackAsync(cancellationToken);
                 skippedCount++;
                 continue;
             }
 
             if (await commissionRecordRepository.ExistsForBookingAsync(booking.Id, cancellationToken))
             {
-                await transaction.CommitAsync(cancellationToken);
                 skippedCount++;
                 continue;
             }
@@ -102,7 +97,6 @@ internal sealed class AutoCompleteExpiredBookingsJob(
 
             await commissionRecordRepository.AddAsync(commissionRecord, cancellationToken);
             await commissionRecordRepository.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
 
             completedCount++;
         }
