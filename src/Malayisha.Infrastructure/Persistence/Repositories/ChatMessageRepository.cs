@@ -22,6 +22,14 @@ internal sealed class ChatMessageRepository(MalayishaDbContext dbContext) : ICha
             .OrderBy(message => message.SentAtUtc)
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<ChatMessage>> ListByBookingIdAsync(
+        Guid bookingId,
+        CancellationToken cancellationToken = default) =>
+        await dbContext.ChatMessages
+            .Where(message => message.BookingId == bookingId)
+            .OrderBy(message => message.SentAtUtc)
+            .ToListAsync(cancellationToken);
+
     public async Task AddAsync(ChatMessage message, CancellationToken cancellationToken = default)
     {
         await dbContext.ChatMessages.AddAsync(message, cancellationToken);
