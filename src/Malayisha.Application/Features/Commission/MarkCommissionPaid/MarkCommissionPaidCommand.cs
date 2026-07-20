@@ -1,14 +1,23 @@
 using FluentValidation;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
-using Malayisha.Domain.Entities;
+using Malayisha.Application.Common.Authorization;
+using Malayisha.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Commission.MarkCommissionPaid;
 
+[AuthorizeRoles(UserRole.Admin)]
 public sealed record MarkCommissionPaidCommand(Guid CommissionRecordId, Guid AdminUserId)
-    : IRequest<Result<CommissionDto>>;
+    : IRequest<Result<CommissionDto>>, IAuditableAdminCommand
+{
+    public Guid TargetId => CommissionRecordId;
+
+    public string AuditAction => CommissionAuditActions.Paid;
+
+    public string TargetType => CommissionAuditActions.TargetType;
+}
 
 internal sealed class MarkCommissionPaidCommandValidator : AbstractValidator<MarkCommissionPaidCommand>
 {
@@ -21,7 +30,6 @@ internal sealed class MarkCommissionPaidCommandValidator : AbstractValidator<Mar
 
 internal sealed class MarkCommissionPaidCommandHandler(
     ICommissionRecordRepository commissionRecordRepository,
-    IAuditLogRepository auditLogRepository,
     TimeProvider timeProvider,
     ILogger<MarkCommissionPaidCommandHandler> logger)
     : IRequestHandler<MarkCommissionPaidCommand, Result<CommissionDto>>
@@ -45,16 +53,6 @@ internal sealed class MarkCommissionPaidCommandHandler(
         {
             return Result<CommissionDto>.Error(CommissionErrorCodes.InvalidCommissionStatus);
         }
-
-        await auditLogRepository.AddAsync(
-            AuditLog.Create(
-                Guid.NewGuid(),
-                request.AdminUserId,
-                CommissionAuditActions.Paid,
-                CommissionAuditActions.TargetType,
-                record.Id,
-                nowUtc),
-            cancellationToken);
 
         await commissionRecordRepository.SaveChangesAsync(cancellationToken);
 

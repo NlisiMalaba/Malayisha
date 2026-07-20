@@ -1,14 +1,23 @@
 using FluentValidation;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
-using Malayisha.Domain.Entities;
+using Malayisha.Application.Common.Authorization;
+using Malayisha.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Commission.InvoiceCommission;
 
+[AuthorizeRoles(UserRole.Admin)]
 public sealed record InvoiceCommissionCommand(Guid CommissionRecordId, Guid AdminUserId)
-    : IRequest<Result<CommissionDto>>;
+    : IRequest<Result<CommissionDto>>, IAuditableAdminCommand
+{
+    public Guid TargetId => CommissionRecordId;
+
+    public string AuditAction => CommissionAuditActions.Invoiced;
+
+    public string TargetType => CommissionAuditActions.TargetType;
+}
 
 internal sealed class InvoiceCommissionCommandValidator : AbstractValidator<InvoiceCommissionCommand>
 {
@@ -21,7 +30,6 @@ internal sealed class InvoiceCommissionCommandValidator : AbstractValidator<Invo
 
 internal sealed class InvoiceCommissionCommandHandler(
     ICommissionRecordRepository commissionRecordRepository,
-    IAuditLogRepository auditLogRepository,
     TimeProvider timeProvider,
     ILogger<InvoiceCommissionCommandHandler> logger)
     : IRequestHandler<InvoiceCommissionCommand, Result<CommissionDto>>
@@ -45,16 +53,6 @@ internal sealed class InvoiceCommissionCommandHandler(
         {
             return Result<CommissionDto>.Error(CommissionErrorCodes.InvalidCommissionStatus);
         }
-
-        await auditLogRepository.AddAsync(
-            AuditLog.Create(
-                Guid.NewGuid(),
-                request.AdminUserId,
-                CommissionAuditActions.Invoiced,
-                CommissionAuditActions.TargetType,
-                record.Id,
-                nowUtc),
-            cancellationToken);
 
         await commissionRecordRepository.SaveChangesAsync(cancellationToken);
 

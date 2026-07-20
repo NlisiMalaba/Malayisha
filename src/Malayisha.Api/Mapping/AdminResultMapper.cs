@@ -73,18 +73,21 @@ internal static class AdminResultMapper
     private static ObjectResult ToReviewErrorResult(string? errorCode) =>
         new(new ErrorResponse(errorCode!))
         {
-            StatusCode = ReviewErrorMapper.ToStatusCode(errorCode)
+            StatusCode = ApplicationErrorMapper.TryGetPipelineStatusCode(errorCode)
+                         ?? ReviewErrorMapper.ToStatusCode(errorCode)
         };
 
     private static ObjectResult ToCommissionErrorResult(string? errorCode) =>
         new(new ErrorResponse(errorCode!))
         {
-            StatusCode = CommissionErrorMapper.ToStatusCode(errorCode)
+            StatusCode = ApplicationErrorMapper.TryGetPipelineStatusCode(errorCode)
+                         ?? CommissionErrorMapper.ToStatusCode(errorCode)
         };
 
     private static ObjectResult ToTripErrorResult(string? errorCode) =>
         new(new ErrorResponse(errorCode!))
         {
-            StatusCode = TripErrorMapper.ToStatusCode(errorCode)
+            StatusCode = ApplicationErrorMapper.TryGetPipelineStatusCode(errorCode)
+                         ?? TripErrorMapper.ToStatusCode(errorCode)
         };
 }

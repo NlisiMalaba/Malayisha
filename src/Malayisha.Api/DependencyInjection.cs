@@ -1,6 +1,7 @@
 using System.Text;
 using Malayisha.Api.Authorization;
 using Malayisha.Api.Chat;
+using Malayisha.Application.Abstractions.Auth;
 using Malayisha.Application.Abstractions.Chat;
 using Malayisha.Domain.Enums;
 using Malayisha.Infrastructure.Options;
@@ -61,6 +62,9 @@ public static class DependencyInjection
                     }
                 };
             });
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
 
         services.AddAuthorization(options =>
         {

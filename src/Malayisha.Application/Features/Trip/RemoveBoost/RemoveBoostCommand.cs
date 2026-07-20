@@ -1,14 +1,23 @@
 using FluentValidation;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
-using Malayisha.Domain.Entities;
+using Malayisha.Application.Common.Authorization;
+using Malayisha.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Trip.RemoveBoost;
 
+[AuthorizeRoles(UserRole.Admin)]
 public sealed record RemoveBoostCommand(Guid TripListingId, Guid AdminUserId)
-    : IRequest<Result<BoostedTripDto>>;
+    : IRequest<Result<BoostedTripDto>>, IAuditableAdminCommand
+{
+    public Guid TargetId => TripListingId;
+
+    public string AuditAction => TripBoostAuditActions.Removed;
+
+    public string TargetType => TripBoostAuditActions.TargetType;
+}
 
 internal sealed class RemoveBoostCommandValidator : AbstractValidator<RemoveBoostCommand>
 {
@@ -21,7 +30,6 @@ internal sealed class RemoveBoostCommandValidator : AbstractValidator<RemoveBoos
 
 internal sealed class RemoveBoostCommandHandler(
     ITripListingRepository tripListingRepository,
-    IAuditLogRepository auditLogRepository,
     TimeProvider timeProvider,
     ILogger<RemoveBoostCommandHandler> logger)
     : IRequestHandler<RemoveBoostCommand, Result<BoostedTripDto>>
@@ -46,16 +54,6 @@ internal sealed class RemoveBoostCommandHandler(
 
         var nowUtc = timeProvider.GetUtcNow().UtcDateTime;
         trip.ClearBoost(nowUtc);
-
-        await auditLogRepository.AddAsync(
-            AuditLog.Create(
-                Guid.NewGuid(),
-                request.AdminUserId,
-                TripBoostAuditActions.Removed,
-                TripBoostAuditActions.TargetType,
-                trip.Id,
-                nowUtc),
-            cancellationToken);
 
         await tripListingRepository.SaveChangesAsync(cancellationToken);
 

@@ -9,4 +9,7 @@ internal sealed class AuditLogRepository(MalayishaDbContext dbContext) : IAuditL
     {
         await dbContext.AuditLogs.AddAsync(auditLog, cancellationToken);
     }
+
+    public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
+        dbContext.SaveChangesAsync(cancellationToken);
 }

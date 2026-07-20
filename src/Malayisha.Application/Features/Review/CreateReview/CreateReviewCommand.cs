@@ -1,12 +1,14 @@
 using FluentValidation;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
+using Malayisha.Application.Common.Authorization;
 using Malayisha.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Review.CreateReview;
 
+[AuthorizeRoles(UserRole.Sender)]
 public sealed record CreateReviewCommand(
     Guid SenderId,
     Guid BookingId,

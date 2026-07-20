@@ -1,12 +1,14 @@
 using FluentValidation;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
+using Malayisha.Application.Common.Authorization;
 using Malayisha.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Commission.GetCommissionReport;
 
+[AuthorizeRoles(UserRole.Admin)]
 public sealed record GetCommissionReportQuery(
     CommissionStatus? Status,
     DateTime? FromCompletionDateUtc,

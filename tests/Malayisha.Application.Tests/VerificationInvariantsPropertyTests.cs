@@ -5,6 +5,8 @@ using Malayisha.Application.Features.Verification.ApplyForVerification;
 using Malayisha.Application.Features.Verification.ApproveVerification;
 using Malayisha.Application.Features.Verification.GetPendingVerifications;
 using Malayisha.Application.Features.Verification.RejectVerification;
+using Malayisha.Application.Common;
+using Malayisha.Application.Tests.Support;
 using Malayisha.Domain.Entities;
 using Malayisha.Domain.Enums;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -318,8 +320,8 @@ public sealed class VerificationInvariantsPropertyTests
             InMemoryAuditLogRepository auditLogs,
             MutableTimeProvider clock,
             ApplyForVerificationCommandHandler applyHandler,
-            ApproveVerificationCommandHandler approveHandler,
-            RejectVerificationCommandHandler rejectHandler)
+            AuditedHandler<ApproveVerificationCommand, Result<VerificationResponse>> approveHandler,
+            AuditedHandler<RejectVerificationCommand, Result<VerificationResponse>> rejectHandler)
         {
             UserId = userId;
             ProfileId = profileId;
@@ -339,8 +341,8 @@ public sealed class VerificationInvariantsPropertyTests
         public IReadOnlyList<AuditLog> AuditLogs { get; }
         public MutableTimeProvider Clock { get; }
         public ApplyForVerificationCommandHandler ApplyHandler { get; }
-        public ApproveVerificationCommandHandler ApproveHandler { get; }
-        public RejectVerificationCommandHandler RejectHandler { get; }
+        public AuditedHandler<ApproveVerificationCommand, Result<VerificationResponse>> ApproveHandler { get; }
+        public AuditedHandler<RejectVerificationCommand, Result<VerificationResponse>> RejectHandler { get; }
 
         public static Harness Create(int userSeed)
         {
@@ -374,18 +376,22 @@ public sealed class VerificationInvariantsPropertyTests
                     verifications,
                     clock,
                     NullLogger<ApplyForVerificationCommandHandler>.Instance),
-                new ApproveVerificationCommandHandler(
-                    verifications,
-                    profiles,
+                new AuditedHandler<ApproveVerificationCommand, Result<VerificationResponse>>(
+                    new ApproveVerificationCommandHandler(
+                        verifications,
+                        profiles,
+                        clock,
+                        NullLogger<ApproveVerificationCommandHandler>.Instance),
                     auditLogs,
-                    clock,
-                    NullLogger<ApproveVerificationCommandHandler>.Instance),
-                new RejectVerificationCommandHandler(
-                    verifications,
-                    profiles,
+                    clock),
+                new AuditedHandler<RejectVerificationCommand, Result<VerificationResponse>>(
+                    new RejectVerificationCommandHandler(
+                        verifications,
+                        profiles,
+                        clock,
+                        NullLogger<RejectVerificationCommandHandler>.Instance),
                     auditLogs,
-                    clock,
-                    NullLogger<RejectVerificationCommandHandler>.Instance));
+                    clock));
         }
     }
 
@@ -407,6 +413,9 @@ public sealed class VerificationInvariantsPropertyTests
             _items.Add(auditLog);
             return Task.CompletedTask;
         }
+
+        public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 
     private sealed class InMemoryVerificationRepository : IVerificationRepository

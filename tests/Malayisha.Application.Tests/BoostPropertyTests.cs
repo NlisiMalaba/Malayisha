@@ -3,6 +3,8 @@ using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Features.Trip;
 using Malayisha.Application.Features.Trip.ApplyBoost;
 using Malayisha.Application.Features.Trip.RemoveBoost;
+using Malayisha.Application.Common;
+using Malayisha.Application.Tests.Support;
 using Malayisha.Domain.Entities;
 using Malayisha.Infrastructure.Jobs;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -164,8 +166,8 @@ public sealed class BoostPropertyTests
             MutableTimeProvider clock,
             InMemoryTripListingRepository repository,
             InMemoryAuditLogRepository auditLogs,
-            ApplyBoostCommandHandler applyHandler,
-            RemoveBoostCommandHandler removeHandler,
+            AuditedHandler<ApplyBoostCommand, Result<BoostedTripDto>> applyHandler,
+            AuditedHandler<RemoveBoostCommand, Result<BoostedTripDto>> removeHandler,
             ExpireBoostsJob expireJob)
         {
             TripId = tripId;
@@ -183,8 +185,8 @@ public sealed class BoostPropertyTests
         public MutableTimeProvider Clock { get; }
         public InMemoryTripListingRepository Repository { get; }
         public IReadOnlyList<AuditLog> AuditLogs { get; }
-        public ApplyBoostCommandHandler ApplyHandler { get; }
-        public RemoveBoostCommandHandler RemoveHandler { get; }
+        public AuditedHandler<ApplyBoostCommand, Result<BoostedTripDto>> ApplyHandler { get; }
+        public AuditedHandler<RemoveBoostCommand, Result<BoostedTripDto>> RemoveHandler { get; }
         public ExpireBoostsJob ExpireJob { get; }
 
         public static BoostTestHarness Create(int tripSeed)
@@ -204,16 +206,20 @@ public sealed class BoostPropertyTests
                 clock,
                 repository,
                 auditLogs,
-                new ApplyBoostCommandHandler(
-                    repository,
+                new AuditedHandler<ApplyBoostCommand, Result<BoostedTripDto>>(
+                    new ApplyBoostCommandHandler(
+                        repository,
+                        clock,
+                        NullLogger<ApplyBoostCommandHandler>.Instance),
                     auditLogs,
-                    clock,
-                    NullLogger<ApplyBoostCommandHandler>.Instance),
-                new RemoveBoostCommandHandler(
-                    repository,
+                    clock),
+                new AuditedHandler<RemoveBoostCommand, Result<BoostedTripDto>>(
+                    new RemoveBoostCommandHandler(
+                        repository,
+                        clock,
+                        NullLogger<RemoveBoostCommandHandler>.Instance),
                     auditLogs,
-                    clock,
-                    NullLogger<RemoveBoostCommandHandler>.Instance),
+                    clock),
                 new ExpireBoostsJob(
                     repository,
                     clock,
@@ -242,6 +248,9 @@ public sealed class BoostPropertyTests
             _items.Add(auditLog);
             return Task.CompletedTask;
         }
+
+        public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 
     private sealed class InMemoryTripListingRepository : ITripListingRepository

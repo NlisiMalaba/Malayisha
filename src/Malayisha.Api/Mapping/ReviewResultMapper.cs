@@ -31,6 +31,7 @@ internal static class ReviewResultMapper
     private static ObjectResult ToErrorResult(string? errorCode) =>
         new(new ErrorResponse(errorCode!))
         {
-            StatusCode = ReviewErrorMapper.ToStatusCode(errorCode)
+            StatusCode = ApplicationErrorMapper.TryGetPipelineStatusCode(errorCode)
+                         ?? ReviewErrorMapper.ToStatusCode(errorCode)
         };
 }

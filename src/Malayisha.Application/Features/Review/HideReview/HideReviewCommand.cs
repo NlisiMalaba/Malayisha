@@ -1,14 +1,23 @@
 using FluentValidation;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
-using Malayisha.Domain.Entities;
+using Malayisha.Application.Common.Authorization;
+using Malayisha.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Review.HideReview;
 
+[AuthorizeRoles(UserRole.Admin)]
 public sealed record HideReviewCommand(Guid ReviewId, Guid AdminUserId)
-    : IRequest<Result<AdminReviewDto>>;
+    : IRequest<Result<AdminReviewDto>>, IAuditableAdminCommand
+{
+    public Guid TargetId => ReviewId;
+
+    public string AuditAction => ReviewAuditActions.Hidden;
+
+    public string TargetType => ReviewAuditActions.TargetType;
+}
 
 internal sealed class HideReviewCommandValidator : AbstractValidator<HideReviewCommand>
 {
@@ -22,7 +31,6 @@ internal sealed class HideReviewCommandValidator : AbstractValidator<HideReviewC
 internal sealed class HideReviewCommandHandler(
     IReviewRepository reviewRepository,
     ITransporterProfileRepository transporterProfileRepository,
-    IAuditLogRepository auditLogRepository,
     TimeProvider timeProvider,
     ILogger<HideReviewCommandHandler> logger)
     : IRequestHandler<HideReviewCommand, Result<AdminReviewDto>>
@@ -59,16 +67,6 @@ internal sealed class HideReviewCommandHandler(
 
         review.SetVisibility(isHidden: true, nowUtc);
         profile.SetAverageRating(averageRating, nowUtc);
-
-        await auditLogRepository.AddAsync(
-            AuditLog.Create(
-                Guid.NewGuid(),
-                request.AdminUserId,
-                ReviewAuditActions.Hidden,
-                ReviewAuditActions.TargetType,
-                review.Id,
-                nowUtc),
-            cancellationToken);
 
         await reviewRepository.SaveChangesAsync(cancellationToken);
 

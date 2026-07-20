@@ -2,17 +2,33 @@ using System.Text.Json;
 using FluentValidation;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
-using Malayisha.Domain.Entities;
+using Malayisha.Application.Common.Authorization;
+using Malayisha.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Trip.ApplyBoost;
 
+[AuthorizeRoles(UserRole.Admin)]
 public sealed record ApplyBoostCommand(
     Guid TripListingId,
     Guid AdminUserId,
     DateTime BoostStartAtUtc,
-    DateTime BoostEndAtUtc) : IRequest<Result<BoostedTripDto>>;
+    DateTime BoostEndAtUtc) : IRequest<Result<BoostedTripDto>>, IAuditableAdminCommand
+{
+    public Guid TargetId => TripListingId;
+
+    public string AuditAction => TripBoostAuditActions.Applied;
+
+    public string TargetType => TripBoostAuditActions.TargetType;
+
+    public string? MetadataJson =>
+        JsonSerializer.Serialize(new
+        {
+            boostStartAtUtc = BoostStartAtUtc,
+            boostEndAtUtc = BoostEndAtUtc
+        });
+}
 
 internal sealed class ApplyBoostCommandValidator : AbstractValidator<ApplyBoostCommand>
 {
@@ -28,7 +44,6 @@ internal sealed class ApplyBoostCommandValidator : AbstractValidator<ApplyBoostC
 
 internal sealed class ApplyBoostCommandHandler(
     ITripListingRepository tripListingRepository,
-    IAuditLogRepository auditLogRepository,
     TimeProvider timeProvider,
     ILogger<ApplyBoostCommandHandler> logger)
     : IRequestHandler<ApplyBoostCommand, Result<BoostedTripDto>>
@@ -56,21 +71,6 @@ internal sealed class ApplyBoostCommandHandler(
         {
             return Result<BoostedTripDto>.Error(TripErrorCodes.InvalidBoostWindow);
         }
-
-        await auditLogRepository.AddAsync(
-            AuditLog.Create(
-                Guid.NewGuid(),
-                request.AdminUserId,
-                TripBoostAuditActions.Applied,
-                TripBoostAuditActions.TargetType,
-                trip.Id,
-                nowUtc,
-                JsonSerializer.Serialize(new
-                {
-                    boostStartAtUtc = request.BoostStartAtUtc,
-                    boostEndAtUtc = request.BoostEndAtUtc
-                })),
-            cancellationToken);
 
         await tripListingRepository.SaveChangesAsync(cancellationToken);
 

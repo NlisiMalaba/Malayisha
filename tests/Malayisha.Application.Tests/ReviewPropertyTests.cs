@@ -7,6 +7,8 @@ using Malayisha.Application.Features.Review.GetAllReviews;
 using Malayisha.Application.Features.Review.GetTransporterReviews;
 using Malayisha.Application.Features.Review.HideReview;
 using Malayisha.Application.Features.Review.RestoreReview;
+using Malayisha.Application.Tests.Support;
+using Malayisha.Application.Common;
 using Malayisha.Domain.Entities;
 using Malayisha.Domain.Enums;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -606,8 +608,8 @@ public sealed class ReviewPropertyTests
             InMemoryAuditLogRepository auditLogs,
             CreateReviewCommandHandler createHandler,
             GetTransporterReviewsQueryHandler listHandler,
-            HideReviewCommandHandler hideHandler,
-            RestoreReviewCommandHandler restoreHandler,
+            AuditedHandler<HideReviewCommand, Result<AdminReviewDto>> hideHandler,
+            AuditedHandler<RestoreReviewCommand, Result<AdminReviewDto>> restoreHandler,
             GetAllReviewsQueryHandler getAllHandler)
         {
             SenderId = senderId;
@@ -635,8 +637,8 @@ public sealed class ReviewPropertyTests
         public IReadOnlyList<AuditLog> AuditLogs { get; }
         public CreateReviewCommandHandler CreateHandler { get; }
         public GetTransporterReviewsQueryHandler ListHandler { get; }
-        public HideReviewCommandHandler HideHandler { get; }
-        public RestoreReviewCommandHandler RestoreHandler { get; }
+        public AuditedHandler<HideReviewCommand, Result<AdminReviewDto>> HideHandler { get; }
+        public AuditedHandler<RestoreReviewCommand, Result<AdminReviewDto>> RestoreHandler { get; }
         public GetAllReviewsQueryHandler GetAllHandler { get; }
 
         public static ReviewTestHarness Create(int senderSeed, int transporterSeed, int tripSeed)
@@ -697,18 +699,22 @@ public sealed class ReviewPropertyTests
                     profiles,
                     reviews,
                     NullLogger<GetTransporterReviewsQueryHandler>.Instance),
-                new HideReviewCommandHandler(
-                    reviews,
-                    profiles,
+                new AuditedHandler<HideReviewCommand, Result<AdminReviewDto>>(
+                    new HideReviewCommandHandler(
+                        reviews,
+                        profiles,
+                        clock,
+                        NullLogger<HideReviewCommandHandler>.Instance),
                     auditLogs,
-                    clock,
-                    NullLogger<HideReviewCommandHandler>.Instance),
-                new RestoreReviewCommandHandler(
-                    reviews,
-                    profiles,
+                    clock),
+                new AuditedHandler<RestoreReviewCommand, Result<AdminReviewDto>>(
+                    new RestoreReviewCommandHandler(
+                        reviews,
+                        profiles,
+                        clock,
+                        NullLogger<RestoreReviewCommandHandler>.Instance),
                     auditLogs,
-                    clock,
-                    NullLogger<RestoreReviewCommandHandler>.Instance),
+                    clock),
                 new GetAllReviewsQueryHandler(
                     reviews,
                     NullLogger<GetAllReviewsQueryHandler>.Instance));
@@ -726,6 +732,9 @@ public sealed class ReviewPropertyTests
             _items.Add(auditLog);
             return Task.CompletedTask;
         }
+
+        public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 
     private sealed class InMemoryBookingRepository : IBookingRepository

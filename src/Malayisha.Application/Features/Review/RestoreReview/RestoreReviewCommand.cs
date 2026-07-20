@@ -1,14 +1,23 @@
 using FluentValidation;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Common;
-using Malayisha.Domain.Entities;
+using Malayisha.Application.Common.Authorization;
+using Malayisha.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Review.RestoreReview;
 
+[AuthorizeRoles(UserRole.Admin)]
 public sealed record RestoreReviewCommand(Guid ReviewId, Guid AdminUserId)
-    : IRequest<Result<AdminReviewDto>>;
+    : IRequest<Result<AdminReviewDto>>, IAuditableAdminCommand
+{
+    public Guid TargetId => ReviewId;
+
+    public string AuditAction => ReviewAuditActions.Restored;
+
+    public string TargetType => ReviewAuditActions.TargetType;
+}
 
 internal sealed class RestoreReviewCommandValidator : AbstractValidator<RestoreReviewCommand>
 {
@@ -22,7 +31,6 @@ internal sealed class RestoreReviewCommandValidator : AbstractValidator<RestoreR
 internal sealed class RestoreReviewCommandHandler(
     IReviewRepository reviewRepository,
     ITransporterProfileRepository transporterProfileRepository,
-    IAuditLogRepository auditLogRepository,
     TimeProvider timeProvider,
     ILogger<RestoreReviewCommandHandler> logger)
     : IRequestHandler<RestoreReviewCommand, Result<AdminReviewDto>>
@@ -59,16 +67,6 @@ internal sealed class RestoreReviewCommandHandler(
 
         review.SetVisibility(isHidden: false, nowUtc);
         profile.SetAverageRating(averageRating, nowUtc);
-
-        await auditLogRepository.AddAsync(
-            AuditLog.Create(
-                Guid.NewGuid(),
-                request.AdminUserId,
-                ReviewAuditActions.Restored,
-                ReviewAuditActions.TargetType,
-                review.Id,
-                nowUtc),
-            cancellationToken);
 
         await reviewRepository.SaveChangesAsync(cancellationToken);
 
