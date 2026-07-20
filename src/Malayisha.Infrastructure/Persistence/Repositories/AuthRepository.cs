@@ -27,6 +27,13 @@ internal sealed class AuthRepository(MalayishaDbContext dbContext) : IAuthReposi
             token => token.TokenHash == tokenHash,
             cancellationToken);
 
+    public async Task<IReadOnlyList<RefreshToken>> ListRefreshTokensForUserAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default) =>
+        await dbContext.RefreshTokens
+            .Where(token => token.UserId == userId && !token.IsRevoked)
+            .ToListAsync(cancellationToken);
+
     public async Task AddRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
     {
         await dbContext.RefreshTokens.AddAsync(refreshToken, cancellationToken);

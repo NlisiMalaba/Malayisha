@@ -15,6 +15,10 @@ public interface IAuthRepository
         string tokenHash,
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<RefreshToken>> ListRefreshTokensForUserAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
+
     Task AddRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);
 
     Task AddOtpRecordAsync(OtpRecord otpRecord, CancellationToken cancellationToken = default);

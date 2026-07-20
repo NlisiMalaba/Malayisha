@@ -79,6 +79,13 @@ public sealed class TransporterProfile
         UpdatedAtUtc = nowUtc;
     }
 
+    public void Anonymize(string anonymizedDisplayName, DateTime nowUtc)
+    {
+        DisplayName = DomainGuard.Required(anonymizedDisplayName, nameof(anonymizedDisplayName));
+        ProfilePhotoUrl = null;
+        UpdatedAtUtc = nowUtc;
+    }
+
     private static List<string> NormalizeRoutes(IEnumerable<string> routesServed)
     {
         ArgumentNullException.ThrowIfNull(routesServed);

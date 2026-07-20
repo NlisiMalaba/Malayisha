@@ -42,7 +42,7 @@ internal sealed class SendOtpCommandHandler(
         {
             return Result.Error(AuthErrorCodes.UserNotFound);
         }
-        else if (!existingUser.IsActive)
+        else if (!existingUser.IsActive || existingUser.IsDeleted)
         {
             return Result.Error(AuthErrorCodes.UserInactive);
         }

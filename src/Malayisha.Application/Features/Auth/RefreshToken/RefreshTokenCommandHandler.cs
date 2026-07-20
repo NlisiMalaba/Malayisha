@@ -38,7 +38,7 @@ internal sealed class RefreshTokenCommandHandler(
             return Result<AuthSessionResponse>.Error(AuthErrorCodes.UserNotFound);
         }
 
-        if (!user.IsActive)
+        if (!user.IsActive || user.IsDeleted)
         {
             return Result<AuthSessionResponse>.Error(AuthErrorCodes.UserInactive);
         }

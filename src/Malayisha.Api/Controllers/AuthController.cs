@@ -1,10 +1,13 @@
+using Malayisha.Api.Authorization;
 using Malayisha.Api.Contracts.Auth;
 using Malayisha.Api.Mapping;
 using Malayisha.Application.Features.Auth;
+using Malayisha.Application.Features.Auth.DeleteAccount;
 using Malayisha.Application.Features.Auth.RefreshToken;
 using Malayisha.Application.Features.Auth.SendOtp;
 using Malayisha.Application.Features.Auth.VerifyOtp;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Malayisha.Api.Controllers;
@@ -75,5 +78,23 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
             cancellationToken);
 
         return AuthResultMapper.ToSessionResult(result);
+    }
+
+    [HttpDelete("account")]
+    [Authorize(Policy = AuthPolicies.SenderOrTransporter)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> DeleteAccount(CancellationToken cancellationToken)
+    {
+        if (!User.TryGetUserId(out var userId))
+        {
+            return Unauthorized(new ErrorResponse("Unauthorized"));
+        }
+
+        var result = await mediator.Send(new DeleteAccountCommand(userId), cancellationToken);
+        return AuthResultMapper.ToDeleteAccountResult(result);
     }
 }

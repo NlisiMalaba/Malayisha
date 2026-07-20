@@ -19,6 +19,7 @@ internal static class AuthErrorMapper
             AuthErrorCodes.RefreshTokenExpired => StatusCodes.Status401Unauthorized,
             AuthErrorCodes.RefreshTokenRevoked => StatusCodes.Status401Unauthorized,
             AuthErrorCodes.RefreshTokenAlreadyUsed => StatusCodes.Status401Unauthorized,
+            AccountErrorCodes.AccountAlreadyDeleted => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status400BadRequest
         };
 }

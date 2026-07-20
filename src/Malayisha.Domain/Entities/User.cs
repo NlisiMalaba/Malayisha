@@ -18,6 +18,7 @@ public sealed class User
     public string PhoneNumber { get; private set; } = string.Empty;
     public UserRole Role { get; private set; }
     public bool IsActive { get; private set; } = true;
+    public bool IsDeleted { get; private set; }
     public string? PushDeviceToken { get; private set; }
     public bool MarketingNotificationsOptIn { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
@@ -29,6 +30,21 @@ public sealed class User
     public void Deactivate(DateTime nowUtc)
     {
         IsActive = false;
+        UpdatedAtUtc = nowUtc;
+    }
+
+    public void AnonymizeAndDelete(string anonymizedPhoneNumber, DateTime nowUtc)
+    {
+        if (IsDeleted)
+        {
+            throw new InvalidOperationException("User account has already been deleted.");
+        }
+
+        PhoneNumber = DomainGuard.Required(anonymizedPhoneNumber, nameof(anonymizedPhoneNumber));
+        PushDeviceToken = null;
+        MarketingNotificationsOptIn = false;
+        IsActive = false;
+        IsDeleted = true;
         UpdatedAtUtc = nowUtc;
     }
 

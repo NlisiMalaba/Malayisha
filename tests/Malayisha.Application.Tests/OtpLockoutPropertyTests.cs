@@ -245,6 +245,11 @@ public sealed class OtpLockoutPropertyTests
             CancellationToken cancellationToken = default) =>
             Task.FromResult<RefreshToken?>(null);
 
+        public Task<IReadOnlyList<RefreshToken>> ListRefreshTokensForUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<RefreshToken>>(Array.Empty<RefreshToken>());
+
         public Task AddRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 

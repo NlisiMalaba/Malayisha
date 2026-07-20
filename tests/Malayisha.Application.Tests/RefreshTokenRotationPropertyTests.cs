@@ -146,6 +146,12 @@ public sealed class RefreshTokenRotationPropertyTests
             CancellationToken cancellationToken = default) =>
             Task.FromResult(_refreshTokensByHash.TryGetValue(tokenHash, out var token) ? token : null);
 
+        public Task<IReadOnlyList<RefreshToken>> ListRefreshTokensForUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<RefreshToken>>(
+                _refreshTokensByHash.Values.Where(token => token.UserId == userId).ToArray());
+
         public Task AddRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
         {
             _refreshTokensByHash[refreshToken.TokenHash] = refreshToken;

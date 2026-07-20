@@ -18,6 +18,11 @@ internal static class AuthResultMapper
             ? new OkObjectResult(ToDto(result.Value))
             : ToErrorResult(result.ErrorCode);
 
+    public static IActionResult ToDeleteAccountResult(Domain.Common.Result result) =>
+        result.IsSuccess
+            ? new NoContentResult()
+            : ToErrorResult(result.ErrorCode);
+
     private static AuthSessionDto ToDto(AuthSessionResponse session) =>
         new(
             session.AccessToken,

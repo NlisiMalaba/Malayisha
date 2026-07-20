@@ -106,7 +106,7 @@ internal sealed class VerifyOtpCommandHandler(
             return Result<User>.Error(AuthErrorCodes.UserNotFound);
         }
 
-        if (!existingUser.IsActive)
+        if (!existingUser.IsActive || existingUser.IsDeleted)
         {
             return Result<User>.Error(AuthErrorCodes.UserInactive);
         }

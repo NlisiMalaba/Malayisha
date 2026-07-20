@@ -24,6 +24,10 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDefaultValue(true)
             .IsRequired();
 
+        builder.Property(user => user.IsDeleted)
+            .HasDefaultValue(false)
+            .IsRequired();
+
         builder.Property(user => user.PushDeviceToken)
             .HasMaxLength(512);
 
