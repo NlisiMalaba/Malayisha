@@ -24,6 +24,12 @@ public interface ITripListingRepository
 {
     Task<TripListing?> FindByIdAsync(Guid tripListingId, CancellationToken cancellationToken = default);
 
+    Task<TripListing?> FindByIdForUpdateAsync(Guid tripListingId, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<TripListing>> ListExpiredBoostedForUpdateAsync(
+        DateTime nowUtc,
+        CancellationToken cancellationToken = default);
+
     Task AddAsync(TripListing tripListing, CancellationToken cancellationToken = default);
 
     /// <summary>

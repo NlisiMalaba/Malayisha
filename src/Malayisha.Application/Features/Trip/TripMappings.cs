@@ -19,6 +19,15 @@ internal static class TripMappings
             trip.CreatedAtUtc,
             trip.UpdatedAtUtc);
 
+    internal static BoostedTripDto ToBoostedDto(TripListing trip) =>
+        new(
+            trip.Id,
+            trip.TransporterProfileId,
+            trip.IsBoosted,
+            trip.BoostStartAtUtc,
+            trip.BoostEndAtUtc,
+            trip.UpdatedAtUtc);
+
     public static TripSearchItemResponse ToSearchItem(TripSearchHit hit) =>
         new(
             hit.Trip.Id,

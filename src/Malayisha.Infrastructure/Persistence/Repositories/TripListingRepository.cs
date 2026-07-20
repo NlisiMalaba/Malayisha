@@ -18,6 +18,21 @@ internal sealed class TripListingRepository(MalayishaDbContext dbContext) : ITri
         dbContext.TripListings
             .FirstOrDefaultAsync(trip => trip.Id == tripListingId, cancellationToken);
 
+    public Task<TripListing?> FindByIdForUpdateAsync(
+        Guid tripListingId,
+        CancellationToken cancellationToken = default) =>
+        FindByIdAsync(tripListingId, cancellationToken);
+
+    public async Task<IReadOnlyList<TripListing>> ListExpiredBoostedForUpdateAsync(
+        DateTime nowUtc,
+        CancellationToken cancellationToken = default) =>
+        await dbContext.TripListings
+            .Where(trip =>
+                trip.IsBoosted
+                && trip.BoostEndAtUtc != null
+                && trip.BoostEndAtUtc <= nowUtc)
+            .ToListAsync(cancellationToken);
+
     public async Task AddAsync(TripListing tripListing, CancellationToken cancellationToken = default)
     {
         await dbContext.TripListings.AddAsync(tripListing, cancellationToken);

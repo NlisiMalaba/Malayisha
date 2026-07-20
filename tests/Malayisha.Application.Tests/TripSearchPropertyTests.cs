@@ -427,6 +427,25 @@ public sealed class TripSearchPropertyTests
         public Task<TripListing?> FindByIdAsync(Guid tripListingId, CancellationToken cancellationToken = default) =>
             Task.FromResult(catalog.Trips.FirstOrDefault(trip => trip.Id == tripListingId));
 
+        public Task<TripListing?> FindByIdForUpdateAsync(
+            Guid tripListingId,
+            CancellationToken cancellationToken = default) =>
+            FindByIdAsync(tripListingId, cancellationToken);
+
+        public Task<IReadOnlyList<TripListing>> ListExpiredBoostedForUpdateAsync(
+            DateTime nowUtc,
+            CancellationToken cancellationToken = default)
+        {
+            var items = catalog.Trips
+                .Where(trip =>
+                    trip.IsBoosted
+                    && trip.BoostEndAtUtc != null
+                    && trip.BoostEndAtUtc <= nowUtc)
+                .ToArray();
+
+            return Task.FromResult<IReadOnlyList<TripListing>>(items);
+        }
+
         public Task AddAsync(TripListing tripListing, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 

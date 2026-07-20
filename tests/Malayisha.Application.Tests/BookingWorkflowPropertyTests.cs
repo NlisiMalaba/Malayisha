@@ -338,6 +338,21 @@ public sealed class BookingWorkflowPropertyTests
         public Task<TripListing?> FindByIdAsync(Guid tripListingId, CancellationToken cancellationToken = default) =>
             Task.FromResult(tripListingId == trip.Id ? trip : null);
 
+        public Task<TripListing?> FindByIdForUpdateAsync(
+            Guid tripListingId,
+            CancellationToken cancellationToken = default) =>
+            FindByIdAsync(tripListingId, cancellationToken);
+
+        public Task<IReadOnlyList<TripListing>> ListExpiredBoostedForUpdateAsync(
+            DateTime nowUtc,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<TripListing>>(
+                trip.IsBoosted
+                && trip.BoostEndAtUtc != null
+                && trip.BoostEndAtUtc <= nowUtc
+                    ? new[] { trip }
+                    : []);
+
         public Task AddAsync(TripListing tripListing, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 
