@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using System.Text;
-using Malayisha.Application.Abstractions.Notifications;
 using Malayisha.Infrastructure.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,7 +9,7 @@ namespace Malayisha.Infrastructure.Notifications;
 internal sealed class AfricasTalkingSmsService(
     IHttpClientFactory httpClientFactory,
     IOptions<SmsOptions> smsOptions,
-    ILogger<AfricasTalkingSmsService> logger) : INotificationService
+    ILogger<AfricasTalkingSmsService> logger) : ISmsNotificationProvider
 {
     private readonly SmsOptions _options = smsOptions.Value;
 

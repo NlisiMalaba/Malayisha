@@ -1,4 +1,3 @@
-using Malayisha.Application.Abstractions.Notifications;
 using Malayisha.Infrastructure.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,7 +9,7 @@ namespace Malayisha.Infrastructure.Notifications;
 
 internal sealed class TwilioSmsService(
     IOptions<SmsOptions> smsOptions,
-    ILogger<TwilioSmsService> logger) : INotificationService
+    ILogger<TwilioSmsService> logger) : ISmsNotificationProvider
 {
     private readonly SmsOptions _options = smsOptions.Value;
     private bool _initialized;
