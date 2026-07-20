@@ -1,9 +1,12 @@
+using Malayisha.Domain.Common;
 using Malayisha.Domain.Enums;
 
 namespace Malayisha.Domain.Entities;
 
 public sealed class CommissionRecord
 {
+    public const string InvalidStateTransitionError = "InvalidCommissionStatus";
+
     private CommissionRecord() { }
 
     private CommissionRecord(
@@ -43,17 +46,29 @@ public sealed class CommissionRecord
         DateTime completionDateUtc) =>
         new(id, bookingId, transporterUserId, agreedPriceZar, commissionRate, completionDateUtc);
 
-    public void MarkInvoiced(Guid adminUserId, DateTime nowUtc)
+    public Result MarkInvoiced(Guid adminUserId, DateTime nowUtc)
     {
+        if (Status != CommissionStatus.Pending)
+        {
+            return Result.Error(InvalidStateTransitionError);
+        }
+
         Status = CommissionStatus.Invoiced;
         UpdatedByAdminUserId = adminUserId;
         UpdatedAtUtc = nowUtc;
+        return Result.Success();
     }
 
-    public void MarkPaid(Guid adminUserId, DateTime nowUtc)
+    public Result MarkPaid(Guid adminUserId, DateTime nowUtc)
     {
+        if (Status != CommissionStatus.Invoiced)
+        {
+            return Result.Error(InvalidStateTransitionError);
+        }
+
         Status = CommissionStatus.Paid;
         UpdatedByAdminUserId = adminUserId;
         UpdatedAtUtc = nowUtc;
+        return Result.Success();
     }
 }

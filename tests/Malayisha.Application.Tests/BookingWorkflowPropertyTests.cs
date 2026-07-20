@@ -256,6 +256,39 @@ public sealed class BookingWorkflowPropertyTests
         public Task<bool> ExistsForBookingAsync(Guid bookingId, CancellationToken cancellationToken = default) =>
             Task.FromResult(Items.Any(item => item.BookingId == bookingId));
 
+        public Task<CommissionRecord?> FindByIdForUpdateAsync(
+            Guid commissionRecordId,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(Items.FirstOrDefault(item => item.Id == commissionRecordId));
+
+        public Task<IReadOnlyList<CommissionRecord>> ListByCriteriaAsync(
+            CommissionReportCriteria criteria,
+            CancellationToken cancellationToken = default)
+        {
+            var query = Items.AsEnumerable();
+
+            if (criteria.Status.HasValue)
+            {
+                query = query.Where(item => item.Status == criteria.Status.Value);
+            }
+
+            if (criteria.FromCompletionDateUtc.HasValue)
+            {
+                query = query.Where(item => item.CompletionDateUtc >= criteria.FromCompletionDateUtc.Value);
+            }
+
+            if (criteria.ToCompletionDateUtc.HasValue)
+            {
+                query = query.Where(item => item.CompletionDateUtc <= criteria.ToCompletionDateUtc.Value);
+            }
+
+            var results = query
+                .OrderByDescending(item => item.CompletionDateUtc)
+                .ToArray();
+
+            return Task.FromResult<IReadOnlyList<CommissionRecord>>(results);
+        }
+
         public Task AddAsync(CommissionRecord commissionRecord, CancellationToken cancellationToken = default)
         {
             Items.Add(commissionRecord);
