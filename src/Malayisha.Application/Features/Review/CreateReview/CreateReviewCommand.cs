@@ -76,6 +76,12 @@ internal sealed class CreateReviewCommandHandler(
         }
 
         var nowUtc = timeProvider.GetUtcNow().UtcDateTime;
+
+        var priorRatings = await reviewRepository.ListPublicRatingsByTransporterProfileIdAsync(
+            profile.Id,
+            cancellationToken);
+        var averageRating = ReviewAverageCalculator.Calculate(priorRatings.Append(request.Rating));
+
         var review = Domain.Entities.Review.Create(
             Guid.NewGuid(),
             booking.Id,
@@ -86,11 +92,6 @@ internal sealed class CreateReviewCommandHandler(
             nowUtc);
 
         await reviewRepository.AddAsync(review, cancellationToken);
-
-        var existingRatings = await reviewRepository.ListPublicRatingsByTransporterProfileIdAsync(
-            profile.Id,
-            cancellationToken);
-        var averageRating = ReviewAverageCalculator.Calculate(existingRatings.Append(request.Rating));
         profile.SetAverageRating(averageRating, nowUtc);
 
         await reviewRepository.SaveChangesAsync(cancellationToken);
