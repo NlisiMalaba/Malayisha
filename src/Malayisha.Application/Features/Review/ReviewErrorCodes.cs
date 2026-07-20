@@ -1,0 +1,12 @@
+namespace Malayisha.Application.Features.Review;
+
+public static class ReviewErrorCodes
+{
+    public const string BookingNotFound = "BookingNotFound";
+    public const string NotBookingSender = "NotBookingSender";
+    public const string BookingNotCompleted = "BookingNotCompleted";
+    public const string ReviewAlreadyExists = "ReviewAlreadyExists";
+    public const string TransporterProfileNotFound = "TransporterProfileNotFound";
+    public const string TripNotFound = "TripNotFound";
+    public const string InvalidRating = "InvalidRating";
+}
