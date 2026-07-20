@@ -14,6 +14,9 @@ internal static class ReviewErrorMapper
             ReviewErrorCodes.ReviewAlreadyExists => StatusCodes.Status409Conflict,
             ReviewErrorCodes.BookingNotCompleted => StatusCodes.Status422UnprocessableEntity,
             ReviewErrorCodes.InvalidRating => StatusCodes.Status400BadRequest,
+            ReviewErrorCodes.ReviewNotFound => StatusCodes.Status404NotFound,
+            ReviewErrorCodes.ReviewAlreadyHidden => StatusCodes.Status422UnprocessableEntity,
+            ReviewErrorCodes.ReviewNotHidden => StatusCodes.Status422UnprocessableEntity,
             _ => StatusCodes.Status400BadRequest
         };
 }
