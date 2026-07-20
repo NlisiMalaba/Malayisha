@@ -1,3 +1,4 @@
+using Malayisha.Api.Contracts.Health;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Malayisha.Api.Controllers;
@@ -7,5 +8,7 @@ namespace Malayisha.Api.Controllers;
 public sealed class HealthController : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get() => Ok(new { status = "healthy", service = "Malayisha.Api" });
+    [ProducesResponseType(typeof(HealthResponse), StatusCodes.Status200OK)]
+    public IActionResult Get() =>
+        Ok(new HealthResponse("healthy", "Malayisha.Api"));
 }

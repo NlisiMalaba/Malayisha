@@ -1,6 +1,7 @@
 using System.Security.Authentication;
 using System.Text.Json.Serialization;
 using Malayisha.Api;
+using Malayisha.Api.OpenApi;
 using Malayisha.Api.Filters;
 using Malayisha.Api.Hubs;
 using Malayisha.Api.Middleware;
@@ -26,7 +27,7 @@ builder.Services.AddControllers(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
-builder.Services.AddOpenApi();
+builder.Services.AddMalayishaOpenApi();
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApiAuthentication(builder.Configuration);
@@ -34,10 +35,7 @@ builder.Services.AddApiSignalR(builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.MapMalayishaApiDocumentation();
 
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
