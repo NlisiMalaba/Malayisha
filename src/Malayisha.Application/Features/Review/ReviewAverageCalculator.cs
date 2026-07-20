@@ -12,4 +12,19 @@ internal static class ReviewAverageCalculator
 
         return Math.Round(values.Average(rating => (decimal)rating), 2, MidpointRounding.AwayFromZero);
     }
+
+    internal static decimal CalculateAfterHiding(IReadOnlyList<int> publicRatings, int hiddenRating)
+    {
+        var ratings = publicRatings.ToList();
+        var index = ratings.IndexOf(hiddenRating);
+        if (index >= 0)
+        {
+            ratings.RemoveAt(index);
+        }
+
+        return Calculate(ratings);
+    }
+
+    internal static decimal CalculateAfterRestoring(IReadOnlyList<int> publicRatings, int restoredRating) =>
+        Calculate(publicRatings.Append(restoredRating));
 }

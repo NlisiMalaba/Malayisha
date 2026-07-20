@@ -29,6 +29,17 @@ internal sealed class ReviewRepository(MalayishaDbContext dbContext) : IReviewRe
             .OrderByDescending(review => review.CreatedAtUtc)
             .ToListAsync(cancellationToken);
 
+    public Task<Review?> FindByIdForUpdateAsync(Guid reviewId, CancellationToken cancellationToken = default) =>
+        dbContext.Reviews
+            .FirstOrDefaultAsync(review => review.Id == reviewId, cancellationToken);
+
+    public async Task<IReadOnlyList<Review>> ListAllOrderedByCreatedAtDescAsync(
+        CancellationToken cancellationToken = default) =>
+        await dbContext.Reviews
+            .AsNoTracking()
+            .OrderByDescending(review => review.CreatedAtUtc)
+            .ToListAsync(cancellationToken);
+
     public async Task AddAsync(Review review, CancellationToken cancellationToken = default)
     {
         await dbContext.Reviews.AddAsync(review, cancellationToken);

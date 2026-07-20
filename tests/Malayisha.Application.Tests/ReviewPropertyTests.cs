@@ -3,7 +3,10 @@ using FsCheck.Xunit;
 using Malayisha.Application.Abstractions.Persistence;
 using Malayisha.Application.Features.Review;
 using Malayisha.Application.Features.Review.CreateReview;
+using Malayisha.Application.Features.Review.GetAllReviews;
 using Malayisha.Application.Features.Review.GetTransporterReviews;
+using Malayisha.Application.Features.Review.HideReview;
+using Malayisha.Application.Features.Review.RestoreReview;
 using Malayisha.Domain.Entities;
 using Malayisha.Domain.Enums;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -70,6 +73,26 @@ public sealed class ReviewPropertyTests
             tripSeed,
             statusSeed,
             ratingSeed).GetAwaiter().GetResult();
+    }
+
+    [Property(MaxTest = 100)]
+    public bool Property30_HiddenReviewExcludedFromPublicListings_HideRestoreCycle(
+        int senderSeed,
+        int transporterSeed,
+        int tripSeed,
+        int reviewCountSeed,
+        int ratingSeed,
+        int hideIndexSeed,
+        int adminSeed)
+    {
+        return RunHiddenReviewExcludedAsync(
+            senderSeed,
+            transporterSeed,
+            tripSeed,
+            reviewCountSeed,
+            ratingSeed,
+            hideIndexSeed,
+            adminSeed).GetAwaiter().GetResult();
     }
 
     private static async Task<bool> RunReviewRoundTripAsync(
@@ -165,6 +188,161 @@ public sealed class ReviewPropertyTests
         }
 
         return harness.Reviews.Items.Count == reviewCount;
+    }
+
+    private static async Task<bool> RunHiddenReviewExcludedAsync(
+        int senderSeed,
+        int transporterSeed,
+        int tripSeed,
+        int reviewCountSeed,
+        int ratingSeed,
+        int hideIndexSeed,
+        int adminSeed)
+    {
+        var harness = ReviewTestHarness.Create(senderSeed, transporterSeed, tripSeed);
+        var reviewCount = (Math.Abs(reviewCountSeed) % 5) + 2;
+        var ratings = new List<int>();
+        var createdReviews = new List<ReviewDto>();
+
+        for (var index = 0; index < reviewCount; index++)
+        {
+            var bookingId = BuildGuid(tripSeed + index + 1);
+            var booking = CreateCompletedBooking(
+                bookingId,
+                harness.TripId,
+                harness.SenderId,
+                harness.TransporterId,
+                BaselineUtc.AddHours(index));
+
+            await harness.Bookings.AddAsync(booking);
+
+            var rating = (Math.Abs(ratingSeed + index) % ReviewConstants.MaxRating) + ReviewConstants.MinRating;
+            var create = await harness.CreateHandler.Handle(
+                new CreateReviewCommand(harness.SenderId, bookingId, rating, null),
+                CancellationToken.None);
+
+            if (create.IsError || create.Value is null)
+            {
+                return false;
+            }
+
+            ratings.Add(rating);
+            createdReviews.Add(create.Value);
+        }
+
+        var hideIndex = Math.Abs(hideIndexSeed) % reviewCount;
+        var reviewToHide = createdReviews[hideIndex];
+        var adminUserId = BuildUserId(adminSeed ^ 0x33333333);
+
+        var hide = await harness.HideHandler.Handle(
+            new HideReviewCommand(reviewToHide.Id, adminUserId),
+            CancellationToken.None);
+
+        if (hide.IsError || hide.Value is null || !hide.Value.IsHidden)
+        {
+            return false;
+        }
+
+        var publicAfterHide = await harness.ListHandler.Handle(
+            new GetTransporterReviewsQuery(harness.ProfileId),
+            CancellationToken.None);
+
+        if (publicAfterHide.IsError
+            || publicAfterHide.Value is null
+            || publicAfterHide.Value.Count != reviewCount - 1
+            || publicAfterHide.Value.Any(review => review.Id == reviewToHide.Id))
+        {
+            return false;
+        }
+
+        var adminAfterHide = await harness.GetAllHandler.Handle(
+            new GetAllReviewsQuery(),
+            CancellationToken.None);
+
+        if (adminAfterHide.IsError
+            || adminAfterHide.Value is null
+            || adminAfterHide.Value.Count != reviewCount)
+        {
+            return false;
+        }
+
+        var hiddenInAdmin = adminAfterHide.Value.First(review => review.Id == reviewToHide.Id);
+        if (!hiddenInAdmin.IsHidden)
+        {
+            return false;
+        }
+
+        var visibleRatings = ratings
+            .Where((_, index) => index != hideIndex)
+            .ToList();
+        var profile = await harness.Profiles.FindByIdAsync(harness.ProfileId);
+        if (profile is null
+            || profile.AverageRating != ReviewAverageCalculator.Calculate(visibleRatings))
+        {
+            return false;
+        }
+
+        var hideAudit = harness.AuditLogs.SingleOrDefault(
+            log => log.TargetId == reviewToHide.Id
+                   && log.Action == ReviewAuditActions.Hidden);
+
+        if (hideAudit is null
+            || hideAudit.ActorUserId != adminUserId
+            || hideAudit.TargetType != ReviewAuditActions.TargetType)
+        {
+            return false;
+        }
+
+        var restore = await harness.RestoreHandler.Handle(
+            new RestoreReviewCommand(reviewToHide.Id, adminUserId),
+            CancellationToken.None);
+
+        if (restore.IsError || restore.Value is null || restore.Value.IsHidden)
+        {
+            return false;
+        }
+
+        var publicAfterRestore = await harness.ListHandler.Handle(
+            new GetTransporterReviewsQuery(harness.ProfileId),
+            CancellationToken.None);
+
+        if (publicAfterRestore.IsError
+            || publicAfterRestore.Value is null
+            || publicAfterRestore.Value.Count != reviewCount
+            || !publicAfterRestore.Value.Any(review => review.Id == reviewToHide.Id))
+        {
+            return false;
+        }
+
+        var adminAfterRestore = await harness.GetAllHandler.Handle(
+            new GetAllReviewsQuery(),
+            CancellationToken.None);
+
+        if (adminAfterRestore.IsError || adminAfterRestore.Value is null)
+        {
+            return false;
+        }
+
+        var restoredInAdmin = adminAfterRestore.Value.First(review => review.Id == reviewToHide.Id);
+        if (restoredInAdmin.IsHidden)
+        {
+            return false;
+        }
+
+        profile = await harness.Profiles.FindByIdAsync(harness.ProfileId);
+        if (profile is null
+            || profile.AverageRating != ReviewAverageCalculator.Calculate(ratings))
+        {
+            return false;
+        }
+
+        var restoreAudit = harness.AuditLogs.SingleOrDefault(
+            log => log.TargetId == reviewToHide.Id
+                   && log.Action == ReviewAuditActions.Restored);
+
+        return restoreAudit is not null
+               && restoreAudit.ActorUserId == adminUserId
+               && restoreAudit.TargetType == ReviewAuditActions.TargetType;
     }
 
     private static async Task<bool> RunOneReviewPerBookingAsync(
@@ -425,8 +603,12 @@ public sealed class ReviewPropertyTests
             InMemoryBookingRepository bookings,
             InMemoryTransporterProfileRepository profiles,
             InMemoryReviewRepository reviews,
+            InMemoryAuditLogRepository auditLogs,
             CreateReviewCommandHandler createHandler,
-            GetTransporterReviewsQueryHandler listHandler)
+            GetTransporterReviewsQueryHandler listHandler,
+            HideReviewCommandHandler hideHandler,
+            RestoreReviewCommandHandler restoreHandler,
+            GetAllReviewsQueryHandler getAllHandler)
         {
             SenderId = senderId;
             TransporterId = transporterId;
@@ -435,8 +617,12 @@ public sealed class ReviewPropertyTests
             Bookings = bookings;
             Profiles = profiles;
             Reviews = reviews;
+            AuditLogs = auditLogs.Items;
             CreateHandler = createHandler;
             ListHandler = listHandler;
+            HideHandler = hideHandler;
+            RestoreHandler = restoreHandler;
+            GetAllHandler = getAllHandler;
         }
 
         public Guid SenderId { get; }
@@ -446,8 +632,12 @@ public sealed class ReviewPropertyTests
         public InMemoryBookingRepository Bookings { get; }
         public InMemoryTransporterProfileRepository Profiles { get; }
         public InMemoryReviewRepository Reviews { get; }
+        public IReadOnlyList<AuditLog> AuditLogs { get; }
         public CreateReviewCommandHandler CreateHandler { get; }
         public GetTransporterReviewsQueryHandler ListHandler { get; }
+        public HideReviewCommandHandler HideHandler { get; }
+        public RestoreReviewCommandHandler RestoreHandler { get; }
+        public GetAllReviewsQueryHandler GetAllHandler { get; }
 
         public static ReviewTestHarness Create(int senderSeed, int transporterSeed, int tripSeed)
         {
@@ -485,6 +675,7 @@ public sealed class ReviewPropertyTests
             var profiles = new InMemoryTransporterProfileRepository(profile);
             var trips = new InMemoryTripListingRepository(trip);
             var reviews = new InMemoryReviewRepository();
+            var auditLogs = new InMemoryAuditLogRepository();
 
             return new ReviewTestHarness(
                 senderId,
@@ -494,6 +685,7 @@ public sealed class ReviewPropertyTests
                 bookings,
                 profiles,
                 reviews,
+                auditLogs,
                 new CreateReviewCommandHandler(
                     bookings,
                     trips,
@@ -504,7 +696,35 @@ public sealed class ReviewPropertyTests
                 new GetTransporterReviewsQueryHandler(
                     profiles,
                     reviews,
-                    NullLogger<GetTransporterReviewsQueryHandler>.Instance));
+                    NullLogger<GetTransporterReviewsQueryHandler>.Instance),
+                new HideReviewCommandHandler(
+                    reviews,
+                    profiles,
+                    auditLogs,
+                    clock,
+                    NullLogger<HideReviewCommandHandler>.Instance),
+                new RestoreReviewCommandHandler(
+                    reviews,
+                    profiles,
+                    auditLogs,
+                    clock,
+                    NullLogger<RestoreReviewCommandHandler>.Instance),
+                new GetAllReviewsQueryHandler(
+                    reviews,
+                    NullLogger<GetAllReviewsQueryHandler>.Instance));
+        }
+    }
+
+    private sealed class InMemoryAuditLogRepository : IAuditLogRepository
+    {
+        private readonly List<AuditLog> _items = [];
+
+        public IReadOnlyList<AuditLog> Items => _items;
+
+        public Task AddAsync(AuditLog auditLog, CancellationToken cancellationToken = default)
+        {
+            _items.Add(auditLog);
+            return Task.CompletedTask;
         }
     }
 
@@ -623,6 +843,19 @@ public sealed class ReviewPropertyTests
         {
             var items = _reviews
                 .Where(review => review.TransporterProfileId == transporterProfileId && !review.IsHidden)
+                .OrderByDescending(review => review.CreatedAtUtc)
+                .ToArray();
+
+            return Task.FromResult<IReadOnlyList<Review>>(items);
+        }
+
+        public Task<Review?> FindByIdForUpdateAsync(Guid reviewId, CancellationToken cancellationToken = default) =>
+            Task.FromResult(_reviews.FirstOrDefault(review => review.Id == reviewId));
+
+        public Task<IReadOnlyList<Review>> ListAllOrderedByCreatedAtDescAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var items = _reviews
                 .OrderByDescending(review => review.CreatedAtUtc)
                 .ToArray();
 

@@ -10,4 +10,15 @@ internal static class ReviewMappings
             review.Rating,
             review.Comment,
             review.CreatedAtUtc);
+
+    internal static AdminReviewDto ToAdminDto(Domain.Entities.Review review) =>
+        new(
+            review.Id,
+            review.BookingId,
+            review.SenderId,
+            review.TransporterProfileId,
+            review.Rating,
+            review.Comment,
+            review.IsHidden,
+            review.CreatedAtUtc);
 }

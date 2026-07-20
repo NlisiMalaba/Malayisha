@@ -14,6 +14,11 @@ public interface IReviewRepository
         Guid transporterProfileId,
         CancellationToken cancellationToken = default);
 
+    Task<Review?> FindByIdForUpdateAsync(Guid reviewId, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Review>> ListAllOrderedByCreatedAtDescAsync(
+        CancellationToken cancellationToken = default);
+
     Task AddAsync(Review review, CancellationToken cancellationToken = default);
 
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
