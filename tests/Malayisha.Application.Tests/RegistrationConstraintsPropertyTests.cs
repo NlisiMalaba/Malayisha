@@ -240,6 +240,16 @@ public sealed class RegistrationConstraintsPropertyTests
     {
         public Task SendSmsAsync(string phoneNumber, string message, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
+
+        public Task SendPushAsync(
+            Guid userId,
+            string deviceToken,
+            string title,
+            string body,
+            NotificationKind kind = NotificationKind.Transactional,
+            IReadOnlyDictionary<string, string>? data = null,
+            CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 
     private sealed class FixedTimeProvider(DateTime utcNow) : TimeProvider

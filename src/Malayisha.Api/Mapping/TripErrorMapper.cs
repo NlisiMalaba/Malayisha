@@ -12,6 +12,8 @@ internal static class TripErrorMapper
             TripErrorCodes.NotTripOwner => StatusCodes.Status403Forbidden,
             TripErrorCodes.DepartureDateMustBeFuture => StatusCodes.Status400BadRequest,
             TripErrorCodes.ActiveBookingsBlockDelete => StatusCodes.Status409Conflict,
+            TripErrorCodes.InvalidBoostWindow => StatusCodes.Status400BadRequest,
+            TripErrorCodes.TripNotBoosted => StatusCodes.Status422UnprocessableEntity,
             _ => StatusCodes.Status400BadRequest
         };
 }

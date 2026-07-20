@@ -1,9 +1,8 @@
 using FluentValidation;
-using Malayisha.Application.Abstractions.Persistence;
+using Malayisha.Application.Features.Booking;
 using Malayisha.Domain.Common;
 using Malayisha.Domain.Enums;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Booking.MarkDelivered;
 
@@ -21,15 +20,10 @@ internal sealed class MarkDeliveredCommandValidator : AbstractValidator<MarkDeli
 }
 
 internal sealed class MarkDeliveredCommandHandler(
-    IBookingRepository bookingRepository,
-    TimeProvider timeProvider,
-    ILogger<MarkDeliveredCommandHandler> logger) : IRequestHandler<MarkDeliveredCommand, Result>
+    IBookingTransitionService bookingTransitionService) : IRequestHandler<MarkDeliveredCommand, Result>
 {
     public Task<Result> Handle(MarkDeliveredCommand request, CancellationToken cancellationToken) =>
-        BookingTransitionExecutor.ExecuteAsync(
-            bookingRepository,
-            timeProvider,
-            logger,
+        bookingTransitionService.ExecuteAsync(
             request.BookingId,
             request.UserId,
             UserRole.Transporter,

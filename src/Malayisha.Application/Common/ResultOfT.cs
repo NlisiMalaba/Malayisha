@@ -1,6 +1,8 @@
+using Malayisha.Domain.Common;
+
 namespace Malayisha.Application.Common;
 
-public sealed class Result<T>
+public sealed class Result<T> : IResultResponse
 {
     private Result(bool isSuccess, string? errorCode, T? value)
     {
@@ -17,4 +19,10 @@ public sealed class Result<T>
     public static Result<T> Success(T value) => new(true, null, value);
 
     public static Result<T> Error(string errorCode) => new(false, errorCode, default);
+
+    public static Result<T> Invalid(string errorCode) => Error(errorCode);
+
+    public static Result<T> Forbidden() => Error(ApplicationErrorCodes.Forbidden);
+
+    public static Result<T> Unauthorized() => Error(ApplicationErrorCodes.Unauthorized);
 }

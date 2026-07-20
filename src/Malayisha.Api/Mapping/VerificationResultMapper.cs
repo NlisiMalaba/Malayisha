@@ -50,6 +50,7 @@ internal static class VerificationResultMapper
     private static ObjectResult ToErrorResult(string? errorCode) =>
         new(new ErrorResponse(errorCode!))
         {
-            StatusCode = VerificationErrorMapper.ToStatusCode(errorCode)
+            StatusCode = ApplicationErrorMapper.TryGetPipelineStatusCode(errorCode)
+                         ?? VerificationErrorMapper.ToStatusCode(errorCode)
         };
 }

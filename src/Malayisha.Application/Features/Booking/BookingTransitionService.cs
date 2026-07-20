@@ -1,23 +1,37 @@
 using Malayisha.Application.Abstractions.Persistence;
+using Malayisha.Application.Features.Booking.Notifications;
 using Malayisha.Domain.Common;
 using Malayisha.Domain.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Booking;
 
-internal static class BookingTransitionExecutor
+public interface IBookingTransitionService
 {
-    public static async Task<Result> ExecuteAsync(
-        IBookingRepository bookingRepository,
-        TimeProvider timeProvider,
-        ILogger logger,
+    Task<Result> ExecuteAsync(
         Guid bookingId,
         Guid actorId,
         UserRole actorRole,
         BookingStatus targetStatus,
         decimal? amountZar,
         bool isSystemAction,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default);
+}
+
+internal sealed class BookingTransitionService(
+    IBookingRepository bookingRepository,
+    IBookingNotificationDispatcher bookingNotificationDispatcher,
+    TimeProvider timeProvider,
+    ILogger<BookingTransitionService> logger) : IBookingTransitionService
+{
+    public async Task<Result> ExecuteAsync(
+        Guid bookingId,
+        Guid actorId,
+        UserRole actorRole,
+        BookingStatus targetStatus,
+        decimal? amountZar,
+        bool isSystemAction,
+        CancellationToken cancellationToken = default)
     {
         var booking = await bookingRepository.FindByIdAsync(bookingId, cancellationToken);
         if (booking is null)
@@ -45,6 +59,13 @@ internal static class BookingTransitionExecutor
             targetStatus,
             actorRole,
             actorId);
+
+        await bookingNotificationDispatcher.DispatchStatusChangeAsync(
+            booking,
+            targetStatus,
+            actorId,
+            isSystemAction,
+            cancellationToken);
 
         return Result.Success();
     }

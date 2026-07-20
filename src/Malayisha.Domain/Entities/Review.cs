@@ -20,6 +20,7 @@ public sealed class Review
         Rating = DomainGuard.InRange(rating, 1, 5, nameof(rating));
         Comment = comment;
         CreatedAtUtc = createdAtUtc;
+        UpdatedAtUtc = createdAtUtc;
     }
 
     public Guid Id { get; private set; }

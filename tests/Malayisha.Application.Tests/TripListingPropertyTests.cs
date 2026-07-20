@@ -518,6 +518,25 @@ public sealed class TripListingPropertyTests
             CancellationToken cancellationToken = default) =>
             Task.FromResult(_byId.TryGetValue(tripListingId, out var trip) ? trip : null);
 
+        public Task<TripListing?> FindByIdForUpdateAsync(
+            Guid tripListingId,
+            CancellationToken cancellationToken = default) =>
+            FindByIdAsync(tripListingId, cancellationToken);
+
+        public Task<IReadOnlyList<TripListing>> ListExpiredBoostedForUpdateAsync(
+            DateTime nowUtc,
+            CancellationToken cancellationToken = default)
+        {
+            var items = _byId.Values
+                .Where(trip =>
+                    trip.IsBoosted
+                    && trip.BoostEndAtUtc != null
+                    && trip.BoostEndAtUtc <= nowUtc)
+                .ToArray();
+
+            return Task.FromResult<IReadOnlyList<TripListing>>(items);
+        }
+
         public Task AddAsync(TripListing tripListing, CancellationToken cancellationToken = default)
         {
             _byId[tripListing.Id] = tripListing;

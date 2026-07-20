@@ -374,6 +374,72 @@ namespace Malayisha.Infrastructure.Migrations
                     b.ToTable("otp_records", (string)null);
                 });
 
+            modelBuilder.Entity("Malayisha.Domain.Entities.PendingNotification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempt_count");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("body");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("DataJson")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("data_json");
+
+                    b.Property<string>("DeviceToken")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
+                        .HasColumnName("device_token");
+
+                    b.Property<DateTime>("LastAttemptAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_attempt_at_utc");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("last_error");
+
+                    b.Property<DateTime>("NextRetryAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_retry_at_utc");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_pending_notifications");
+
+                    b.HasIndex("NextRetryAtUtc")
+                        .HasDatabaseName("idx_pending_notifications_next_retry");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_pending_notifications_user_id");
+
+                    b.ToTable("pending_notifications", (string)null);
+                });
+
             modelBuilder.Entity("Malayisha.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -644,11 +710,22 @@ namespace Malayisha.Infrastructure.Migrations
                         .HasDefaultValue(true)
                         .HasColumnName("is_active");
 
+                    b.Property<bool>("MarketingNotificationsOptIn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("marketing_notifications_opt_in");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasColumnName("phone_number");
+
+                    b.Property<string>("PushDeviceToken")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
+                        .HasColumnName("push_device_token");
 
                     b.Property<int>("Role")
                         .HasColumnType("integer")
@@ -806,6 +883,16 @@ namespace Malayisha.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_delivery_requests_users_sender_id");
+                });
+
+            modelBuilder.Entity("Malayisha.Domain.Entities.PendingNotification", b =>
+                {
+                    b.HasOne("Malayisha.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_pending_notifications_users_user_id");
                 });
 
             modelBuilder.Entity("Malayisha.Domain.Entities.RefreshToken", b =>

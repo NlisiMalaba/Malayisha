@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using Malayisha.Application.Common;
 
 namespace Malayisha.Application.Behaviors;
 
@@ -27,11 +28,16 @@ internal sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValid
             .Where(failure => failure is not null)
             .ToList();
 
-        if (failures.Count > 0)
+        if (failures.Count == 0)
         {
-            throw new ValidationException(failures);
+            return await next(cancellationToken);
         }
 
-        return await next(cancellationToken);
+        var errorCode = failures
+            .Select(failure => failure.ErrorCode)
+            .FirstOrDefault(code => !string.IsNullOrWhiteSpace(code))
+            ?? ApplicationErrorCodes.ValidationFailed;
+
+        return ResultResponseFactory.ValidationFailed<TResponse>(errorCode);
     }
 }

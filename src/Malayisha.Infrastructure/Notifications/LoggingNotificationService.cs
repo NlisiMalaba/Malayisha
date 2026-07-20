@@ -1,10 +1,9 @@
-using Malayisha.Application.Abstractions.Notifications;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Infrastructure.Notifications;
 
-internal sealed class LoggingNotificationService(ILogger<LoggingNotificationService> logger)
-    : INotificationService
+internal sealed class LoggingSmsNotificationProvider(ILogger<LoggingSmsNotificationProvider> logger)
+    : ISmsNotificationProvider
 {
     public Task SendSmsAsync(
         string phoneNumber,

@@ -1,14 +1,51 @@
 using Malayisha.Application.Abstractions.Jobs;
+using Malayisha.Application.Abstractions.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Infrastructure.Jobs;
 
-internal sealed class ExpireBoostsJob(ILogger<ExpireBoostsJob> logger) : IExpireBoostsJob
+internal sealed class ExpireBoostsJob(
+    ITripListingRepository tripListingRepository,
+    TimeProvider timeProvider,
+    ILogger<ExpireBoostsJob> logger) : IExpireBoostsJob
 {
-    public Task ExecuteAsync(CancellationToken cancellationToken = default)
+    public async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
-        // Business logic is implemented in task 11.6 (clear expired trip listing boosts).
-        logger.LogDebug("ExpireBoostsJob invoked; awaiting boost workflow wiring.");
-        return Task.CompletedTask;
+        var nowUtc = timeProvider.GetUtcNow().UtcDateTime;
+        var expiredTrips = await tripListingRepository.ListExpiredBoostedForUpdateAsync(
+            nowUtc,
+            cancellationToken);
+
+        if (expiredTrips.Count == 0)
+        {
+            logger.LogDebug("ExpireBoostsJob found no expired boosts at {NowUtc}", nowUtc);
+            return;
+        }
+
+        var clearedCount = 0;
+
+        foreach (var trip in expiredTrips)
+        {
+            if (!trip.IsBoosted
+                || trip.BoostEndAtUtc is null
+                || trip.BoostEndAtUtc > nowUtc)
+            {
+                continue;
+            }
+
+            trip.ClearBoost(nowUtc);
+            clearedCount++;
+        }
+
+        if (clearedCount > 0)
+        {
+            await tripListingRepository.SaveChangesAsync(cancellationToken);
+        }
+
+        logger.LogInformation(
+            "ExpireBoostsJob cleared {ClearedCount} expired boosts out of {CandidateCount} candidates at {NowUtc}",
+            clearedCount,
+            expiredTrips.Count,
+            nowUtc);
     }
 }

@@ -22,6 +22,7 @@ public sealed class MalayishaDbContext : DbContext
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<OtpRecord> OtpRecords => Set<OtpRecord>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<PendingNotification> PendingNotifications => Set<PendingNotification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
