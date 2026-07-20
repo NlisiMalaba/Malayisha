@@ -10,6 +10,7 @@ internal sealed class NotificationService(
     ISmsNotificationProvider smsProvider,
     IFcmPushNotificationSender fcmSender,
     IPendingNotificationRepository pendingNotificationRepository,
+    IAuthRepository authRepository,
     TimeProvider timeProvider,
     ILogger<NotificationService> logger) : INotificationService
 {
@@ -24,9 +25,22 @@ internal sealed class NotificationService(
         string deviceToken,
         string title,
         string body,
+        NotificationKind kind = NotificationKind.Transactional,
         IReadOnlyDictionary<string, string>? data = null,
         CancellationToken cancellationToken = default)
     {
+        if (kind == NotificationKind.Marketing)
+        {
+            var user = await authRepository.FindUserByIdAsync(userId, cancellationToken);
+            if (user is null || !user.MarketingNotificationsOptIn)
+            {
+                logger.LogDebug(
+                    "Skipping marketing push for user {UserId}; user missing or not opted in",
+                    userId);
+                return;
+            }
+        }
+
         var result = await fcmSender.SendAsync(
             new FcmPushMessage(deviceToken, title, body, data),
             cancellationToken);

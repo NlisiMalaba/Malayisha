@@ -1,9 +1,8 @@
 using FluentValidation;
-using Malayisha.Application.Abstractions.Persistence;
+using Malayisha.Application.Features.Booking;
 using Malayisha.Domain.Common;
 using Malayisha.Domain.Enums;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Booking.CompleteBooking;
 
@@ -26,15 +25,10 @@ internal sealed class CompleteBookingCommandValidator : AbstractValidator<Comple
 }
 
 internal sealed class CompleteBookingCommandHandler(
-    IBookingRepository bookingRepository,
-    TimeProvider timeProvider,
-    ILogger<CompleteBookingCommandHandler> logger) : IRequestHandler<CompleteBookingCommand, Result>
+    IBookingTransitionService bookingTransitionService) : IRequestHandler<CompleteBookingCommand, Result>
 {
     public Task<Result> Handle(CompleteBookingCommand request, CancellationToken cancellationToken) =>
-        BookingTransitionExecutor.ExecuteAsync(
-            bookingRepository,
-            timeProvider,
-            logger,
+        bookingTransitionService.ExecuteAsync(
             request.BookingId,
             request.UserId,
             request.ActorRole,

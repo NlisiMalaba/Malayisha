@@ -24,6 +24,13 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDefaultValue(true)
             .IsRequired();
 
+        builder.Property(user => user.PushDeviceToken)
+            .HasMaxLength(512);
+
+        builder.Property(user => user.MarketingNotificationsOptIn)
+            .HasDefaultValue(false)
+            .IsRequired();
+
         builder.Property(user => user.CreatedAtUtc)
             .HasColumnType("timestamp with time zone")
             .IsRequired();

@@ -1,9 +1,8 @@
 using FluentValidation;
-using Malayisha.Application.Abstractions.Persistence;
+using Malayisha.Application.Features.Booking;
 using Malayisha.Domain.Common;
 using Malayisha.Domain.Enums;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Malayisha.Application.Features.Booking.MarkInTransit;
 
@@ -21,15 +20,10 @@ internal sealed class MarkInTransitCommandValidator : AbstractValidator<MarkInTr
 }
 
 internal sealed class MarkInTransitCommandHandler(
-    IBookingRepository bookingRepository,
-    TimeProvider timeProvider,
-    ILogger<MarkInTransitCommandHandler> logger) : IRequestHandler<MarkInTransitCommand, Result>
+    IBookingTransitionService bookingTransitionService) : IRequestHandler<MarkInTransitCommand, Result>
 {
     public Task<Result> Handle(MarkInTransitCommand request, CancellationToken cancellationToken) =>
-        BookingTransitionExecutor.ExecuteAsync(
-            bookingRepository,
-            timeProvider,
-            logger,
+        bookingTransitionService.ExecuteAsync(
             request.BookingId,
             request.UserId,
             UserRole.Transporter,

@@ -1,6 +1,8 @@
 using FluentValidation;
 using Malayisha.Application.Behaviors;
 using Malayisha.Application.Features.Auth.Otp;
+using Malayisha.Application.Features.Booking;
+using Malayisha.Application.Features.Booking.Notifications;
 using Malayisha.Application.Options;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -30,6 +32,9 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(typeof(AssemblyMarker).Assembly);
 
         services.AddSingleton<IOtpSecurityService, OtpSecurityService>();
+
+        services.AddScoped<IBookingTransitionService, BookingTransitionService>();
+        services.AddScoped<IBookingNotificationDispatcher, BookingNotificationDispatcher>();
 
         return services;
     }

@@ -12,6 +12,7 @@ public interface INotificationService
         string deviceToken,
         string title,
         string body,
+        NotificationKind kind = NotificationKind.Transactional,
         IReadOnlyDictionary<string, string>? data = null,
         CancellationToken cancellationToken = default);
 }
