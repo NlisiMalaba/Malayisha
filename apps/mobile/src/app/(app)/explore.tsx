@@ -6,12 +6,19 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuthStore } from '@/stores/auth-store';
+import { useDeliveryRequestsStore } from '@/stores/delivery-requests-store';
 
 /** Temporary account tab until Profile (16.6) lands. */
 export default function AccountScreen() {
   const phoneNumber = useAuthStore((state) => state.phoneNumber);
   const role = useAuthStore((state) => state.role);
   const clearSession = useAuthStore((state) => state.clearSession);
+  const clearRequests = useDeliveryRequestsStore((state) => state.clear);
+
+  async function handleSignOut() {
+    await clearRequests();
+    await clearSession();
+  }
 
   return (
     <ThemedView style={styles.container}>
@@ -23,7 +30,7 @@ export default function AccountScreen() {
           </ThemedText>
         </ThemedView>
 
-        <Button label="Sign out" variant="secondary" onPress={() => void clearSession()} />
+        <Button label="Sign out" variant="secondary" onPress={() => void handleSignOut()} />
       </SafeAreaView>
     </ThemedView>
   );
