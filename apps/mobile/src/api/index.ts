@@ -1,4 +1,6 @@
 import Constants from 'expo-constants';
+
+import { configureAuthClient, refreshAccessToken } from './auth-client';
 import { client } from './generated/client.gen';
 
 const defaultBaseUrl =
@@ -7,7 +9,8 @@ const defaultBaseUrl =
   'http://localhost:5098';
 
 client.setConfig({ baseUrl: defaultBaseUrl });
+configureAuthClient();
 
-export { client };
+export { client, refreshAccessToken };
 export * from './generated/sdk.gen';
 export type * from './generated/types.gen';
