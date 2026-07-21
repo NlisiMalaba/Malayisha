@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 
 import { useTheme } from '@/hooks/use-theme';
 
-export default function BookingsStackLayout() {
+export default function BookingDetailLayout() {
   const theme = useTheme();
 
   return (
@@ -13,8 +13,8 @@ export default function BookingsStackLayout() {
         headerShadowVisible: false,
         contentStyle: { backgroundColor: theme.background },
       }}>
-      <Stack.Screen name="index" options={{ title: 'Bookings', headerLargeTitle: true }} />
-      <Stack.Screen name="[id]" options={{ headerShown: false }} />
+      <Stack.Screen name="index" options={{ title: 'Booking details' }} />
+      <Stack.Screen name="chat" options={{ title: 'Chat' }} />
     </Stack>
   );
 }

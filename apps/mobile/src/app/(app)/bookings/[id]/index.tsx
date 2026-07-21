@@ -237,6 +237,12 @@ export default function BookingDetailScreen() {
 
           <ErrorBanner message={formError} />
 
+          <Button
+            label="Open chat"
+            variant="secondary"
+            onPress={() => router.push(`/bookings/${booking.id}/chat`)}
+          />
+
           <ThemedView style={styles.actions}>
             {actions.map((action) => (
               <Button
