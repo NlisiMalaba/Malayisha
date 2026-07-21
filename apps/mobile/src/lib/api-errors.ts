@@ -16,6 +16,12 @@ const API_ERROR_MESSAGES: Record<string, string> = {
   DeliveryRequestAlreadyBooked: 'This delivery request is already linked to a booking.',
   SelfBookingNotAllowed: 'You cannot book your own trip.',
   InvalidStateTransition: 'This action is not allowed for the current booking status.',
+  ProfileAlreadyExists: 'You already have a transporter profile.',
+  ProfileNotFound: 'Transporter profile was not found.',
+  InvalidProfilePhoto: 'Use a JPEG, PNG, or WebP image for your profile photo.',
+  ActiveVerificationExists: 'You already have a pending or approved verification application.',
+  VerificationNotFound: 'Verification application was not found.',
+  InvalidVerificationStatus: 'This verification cannot be updated in its current status.',
 };
 
 export function messageForApiError(error: unknown, fallback?: string): string {

@@ -1545,6 +1545,39 @@ export type PutApiNotificationsPreferencesResponses = {
 
 export type PutApiNotificationsPreferencesResponse = PutApiNotificationsPreferencesResponses[keyof PutApiNotificationsPreferencesResponses];
 
+export type GetApiProfileMeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/profile/me';
+};
+
+export type GetApiProfileMeErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+};
+
+export type GetApiProfileMeError = GetApiProfileMeErrors[keyof GetApiProfileMeErrors];
+
+export type GetApiProfileMeResponses = {
+    /**
+     * OK
+     */
+    200: TransporterProfileDto;
+};
+
+export type GetApiProfileMeResponse = GetApiProfileMeResponses[keyof GetApiProfileMeResponses];
+
 export type PostApiProfileData = {
     body: CreateProfileRequest;
     path?: never;

@@ -3,6 +3,7 @@ using Malayisha.Api.Contracts.Auth;
 using Malayisha.Api.Contracts.Profile;
 using Malayisha.Api.Mapping;
 using Malayisha.Application.Features.Profile.CreateProfile;
+using Malayisha.Application.Features.Profile.GetMyProfile;
 using Malayisha.Application.Features.Profile.GetPublicProfile;
 using Malayisha.Application.Features.Profile.UpdateProfile;
 using Malayisha.Application.Features.Profile.UploadPhoto;
@@ -16,6 +17,23 @@ namespace Malayisha.Api.Controllers;
 [Route("api/profile")]
 public sealed class ProfileController(IMediator mediator) : ControllerBase
 {
+    [HttpGet("me")]
+    [Authorize(Policy = AuthPolicies.TransporterOnly)]
+    [ProducesResponseType(typeof(TransporterProfileDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMine(CancellationToken cancellationToken)
+    {
+        if (!User.TryGetUserId(out var userId))
+        {
+            return Unauthorized(new ErrorResponse("Unauthorized"));
+        }
+
+        var result = await mediator.Send(new GetMyProfileQuery(userId), cancellationToken);
+        return ProfileResultMapper.ToOwnerResult(result);
+    }
+
     [HttpPost]
     [Authorize(Policy = AuthPolicies.TransporterOnly)]
     [ProducesResponseType(typeof(TransporterProfileDto), StatusCodes.Status201Created)]
