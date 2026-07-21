@@ -19,6 +19,7 @@ import {
   putApiProfile,
   type TransporterProfileDto,
 } from '@/api';
+import { NotificationPreferencesSection } from '@/components/notifications/notification-preferences-section';
 import { CityChip } from '@/components/trips/trip-result-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -256,16 +257,21 @@ export default function ProfileScreen() {
     return (
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea}>
-          <ThemedView style={styles.header}>
-            <ThemedText type="subtitle">Account</ThemedText>
-            <ThemedText type="default" themeColor="textSecondary">
-              {phoneNumber ?? 'Unknown phone'} · {role ?? 'Unknown role'}
-            </ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">
-              Transporter profiles are available when you sign in as a Transporter.
-            </ThemedText>
-          </ThemedView>
-          <Button label="Sign out" variant="secondary" onPress={() => void handleSignOut()} />
+          <ScrollView contentContainerStyle={styles.content}>
+            <ThemedView style={styles.header}>
+              <ThemedText type="subtitle">Account</ThemedText>
+              <ThemedText type="default" themeColor="textSecondary">
+                {phoneNumber ?? 'Unknown phone'} · {role ?? 'Unknown role'}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                Transporter profiles are available when you sign in as a Transporter.
+              </ThemedText>
+            </ThemedView>
+
+            <NotificationPreferencesSection />
+
+            <Button label="Sign out" variant="secondary" onPress={() => void handleSignOut()} />
+          </ScrollView>
         </SafeAreaView>
       </ThemedView>
     );
@@ -390,6 +396,8 @@ export default function ProfileScreen() {
                 onPress={() => router.push('/profile/verification')}
               />
             ) : null}
+
+            <NotificationPreferencesSection />
 
             <Button label="Sign out" variant="secondary" onPress={() => void handleSignOut()} />
           </ScrollView>

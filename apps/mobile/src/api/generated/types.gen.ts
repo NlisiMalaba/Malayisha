@@ -221,12 +221,20 @@ export type PublicTransporterProfileDto = {
     averageRating: number | string;
 };
 
+export type PushDeviceTokenDto = {
+    registered: boolean;
+};
+
 export type QuoteBookingRequest = {
     quotedPriceZar: number | string;
 };
 
 export type RefreshRequest = {
     refreshToken: string;
+};
+
+export type RegisterPushDeviceTokenRequest = {
+    deviceToken: string;
 };
 
 export type RegisterRequest = {
@@ -1508,6 +1516,39 @@ export type GetApiHealthResponses = {
 
 export type GetApiHealthResponse = GetApiHealthResponses[keyof GetApiHealthResponses];
 
+export type GetApiNotificationsPreferencesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/notifications/preferences';
+};
+
+export type GetApiNotificationsPreferencesErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+};
+
+export type GetApiNotificationsPreferencesError = GetApiNotificationsPreferencesErrors[keyof GetApiNotificationsPreferencesErrors];
+
+export type GetApiNotificationsPreferencesResponses = {
+    /**
+     * OK
+     */
+    200: NotificationPreferencesDto;
+};
+
+export type GetApiNotificationsPreferencesResponse = GetApiNotificationsPreferencesResponses[keyof GetApiNotificationsPreferencesResponses];
+
 export type PutApiNotificationsPreferencesData = {
     body: UpdateNotificationPreferencesRequest;
     path?: never;
@@ -1544,6 +1585,43 @@ export type PutApiNotificationsPreferencesResponses = {
 };
 
 export type PutApiNotificationsPreferencesResponse = PutApiNotificationsPreferencesResponses[keyof PutApiNotificationsPreferencesResponses];
+
+export type PutApiNotificationsDeviceTokenData = {
+    body: RegisterPushDeviceTokenRequest;
+    path?: never;
+    query?: never;
+    url: '/api/notifications/device-token';
+};
+
+export type PutApiNotificationsDeviceTokenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse;
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+};
+
+export type PutApiNotificationsDeviceTokenError = PutApiNotificationsDeviceTokenErrors[keyof PutApiNotificationsDeviceTokenErrors];
+
+export type PutApiNotificationsDeviceTokenResponses = {
+    /**
+     * OK
+     */
+    200: PushDeviceTokenDto;
+};
+
+export type PutApiNotificationsDeviceTokenResponse = PutApiNotificationsDeviceTokenResponses[keyof PutApiNotificationsDeviceTokenResponses];
 
 export type GetApiProfileMeData = {
     body?: never;

@@ -10,11 +10,19 @@ internal static class NotificationResultMapper
 {
     public static IActionResult ToPreferencesResult(Result<NotificationPreferencesResponse> result) =>
         result.IsSuccess && result.Value is not null
-            ? new OkObjectResult(ToDto(result.Value))
+            ? new OkObjectResult(ToPreferencesDto(result.Value))
             : ToErrorResult(result.ErrorCode);
 
-    private static NotificationPreferencesDto ToDto(NotificationPreferencesResponse preferences) =>
+    public static IActionResult ToDeviceTokenResult(Result<PushDeviceTokenResponse> result) =>
+        result.IsSuccess && result.Value is not null
+            ? new OkObjectResult(ToDeviceTokenDto(result.Value))
+            : ToErrorResult(result.ErrorCode);
+
+    private static NotificationPreferencesDto ToPreferencesDto(NotificationPreferencesResponse preferences) =>
         new(preferences.MarketingNotificationsOptIn);
+
+    private static PushDeviceTokenDto ToDeviceTokenDto(PushDeviceTokenResponse response) =>
+        new(response.Registered);
 
     private static ObjectResult ToErrorResult(string? errorCode) =>
         new(new ErrorResponse(errorCode!))

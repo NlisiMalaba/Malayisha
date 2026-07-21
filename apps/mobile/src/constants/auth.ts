@@ -5,6 +5,7 @@
 export const AuthRole = {
   Sender: 'Sender',
   Transporter: 'Transporter',
+  Admin: 'Admin',
 } as const;
 
 export type AuthRoleValue = (typeof AuthRole)[keyof typeof AuthRole];

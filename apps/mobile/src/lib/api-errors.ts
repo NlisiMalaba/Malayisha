@@ -22,6 +22,14 @@ const API_ERROR_MESSAGES: Record<string, string> = {
   ActiveVerificationExists: 'You already have a pending or approved verification application.',
   VerificationNotFound: 'Verification application was not found.',
   InvalidVerificationStatus: 'This verification cannot be updated in its current status.',
+  CommissionRecordNotFound: 'Commission record was not found.',
+  InvalidCommissionStatus: 'This commission status change is not allowed.',
+  InvalidDateRange: 'Check the commission date range filters.',
+  ReviewNotFound: 'Review was not found.',
+  ReviewAlreadyHidden: 'This review is already hidden.',
+  ReviewNotHidden: 'This review is not hidden.',
+  UserNotFound: 'Your account was not found.',
+  UserInactive: 'Your account is inactive.',
 };
 
 export function messageForApiError(error: unknown, fallback?: string): string {

@@ -14,8 +14,13 @@ import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
+import { AuthRole } from '@/constants/auth';
+import { useAuthStore } from '@/stores/auth-store';
 
 export default function AppTabs() {
+  const role = useAuthStore((state) => state.role);
+  const isAdmin = role === AuthRole.Admin;
+
   return (
     <Tabs>
       <TabSlot style={{ height: '100%' }} />
@@ -33,6 +38,11 @@ export default function AppTabs() {
           <TabTrigger name="profile" href="/profile" asChild>
             <TabButton>Profile</TabButton>
           </TabTrigger>
+          {isAdmin ? (
+            <TabTrigger name="admin" href="/admin" asChild>
+              <TabButton>Admin</TabButton>
+            </TabTrigger>
+          ) : null}
         </CustomTabList>
       </TabList>
     </Tabs>

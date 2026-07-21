@@ -39,6 +39,13 @@
         {
           "photosPermission": "Allow Malayisha to access your photos for your transporter profile."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#208AEF",
+          "defaultChannel": "default"
+        }
       ]
     ],
     "experiments": {
