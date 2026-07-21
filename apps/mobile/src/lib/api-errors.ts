@@ -7,6 +7,15 @@ const API_ERROR_MESSAGES: Record<string, string> = {
   AssociatedBookingBlocksUpdate: 'This request already has a booking and cannot be edited.',
   ActiveBookingsBlockCancel:
     'This request has an active booking and cannot be cancelled.',
+  BookingNotFound: 'This booking was not found.',
+  NotBookingParticipant: 'You are not a participant on this booking.',
+  TripNotFound: 'This trip was not found.',
+  TransporterProfileNotFound: 'Transporter profile was not found.',
+  DeliveryRequestNotActive: 'This delivery request is not active.',
+  DeliveryRequestNotOwnedBySender: 'You can only book with your own delivery request.',
+  DeliveryRequestAlreadyBooked: 'This delivery request is already linked to a booking.',
+  SelfBookingNotAllowed: 'You cannot book your own trip.',
+  InvalidStateTransition: 'This action is not allowed for the current booking status.',
 };
 
 export function messageForApiError(error: unknown, fallback?: string): string {

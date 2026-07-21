@@ -3,24 +3,30 @@ import { Image, Linking, ScrollView, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getApiTripsByIdShareLink } from '@/api';
+import { getApiTripsByIdShareLink, postApiBookings } from '@/api';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Button, ErrorBanner } from '@/components/ui/form-controls';
+import { AuthRole } from '@/constants/auth';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { extractErrorCode, messageForAuthError } from '@/lib/auth-errors';
+import { messageForApiError } from '@/lib/api-errors';
 import { formatDateOnly, formatKg, formatRating, formatZar } from '@/lib/format';
+import { useAuthStore } from '@/stores/auth-store';
 import { useTripDetailStore } from '@/stores/trip-detail-store';
 
 export default function TripDetailScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const tripId = typeof params.id === 'string' ? params.id : undefined;
   const trip = useTripDetailStore((state) => state.trip);
+  const role = useAuthStore((state) => state.role);
 
   const [sharing, setSharing] = useState(false);
+  const [booking, setBooking] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   const matchesSelection = Boolean(trip && tripId && trip.id === tripId);
+  const canRequestBooking = role === AuthRole.Sender;
 
   async function handleWhatsAppShare() {
     if (!tripId) {
@@ -36,12 +42,7 @@ export default function TripDetailScreen() {
       });
 
       if (error || !data?.url) {
-        setShareError(
-          messageForAuthError(
-            extractErrorCode(error),
-            'Unable to build WhatsApp share link for this trip.',
-          ),
-        );
+        setShareError(messageForApiError(error, 'Unable to build WhatsApp share link for this trip.'));
         return;
       }
 
@@ -56,6 +57,36 @@ export default function TripDetailScreen() {
       setShareError('Unable to open WhatsApp share link.');
     } finally {
       setSharing(false);
+    }
+  }
+
+  async function handleRequestBooking() {
+    if (!tripId) {
+      setBookingError('Missing trip id.');
+      return;
+    }
+
+    setBookingError(null);
+    setBooking(true);
+    try {
+      const { data, error } = await postApiBookings({
+        body: {
+          tripListingId: tripId,
+          deliveryRequestId: null,
+          message: null,
+        },
+      });
+
+      if (error || !data?.bookingId) {
+        setBookingError(messageForApiError(error, 'Unable to create a booking for this trip.'));
+        return;
+      }
+
+      router.push(`/bookings/${data.bookingId}`);
+    } catch {
+      setBookingError('Unable to create a booking. Check your connection.');
+    } finally {
+      setBooking(false);
     }
   }
 
@@ -125,9 +156,19 @@ export default function TripDetailScreen() {
           </ThemedView>
 
           <ErrorBanner message={shareError} />
+          <ErrorBanner message={bookingError} />
+
+          {canRequestBooking ? (
+            <Button
+              label="Request booking"
+              loading={booking}
+              onPress={() => void handleRequestBooking()}
+            />
+          ) : null}
 
           <Button
             label="Share on WhatsApp"
+            variant="secondary"
             loading={sharing}
             onPress={() => void handleWhatsAppShare()}
           />

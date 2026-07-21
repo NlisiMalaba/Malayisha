@@ -20,6 +20,29 @@ internal sealed class BookingRepository(MalayishaDbContext dbContext) : IBooking
                 && booking.Status != BookingStatus.Cancelled)
             .ToListAsync(cancellationToken);
 
+    public async Task<BookingListPage> ListByParticipantAsync(
+        Guid userId,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var query = dbContext.Bookings
+            .AsNoTracking()
+            .Where(booking => booking.SenderId == userId || booking.TransporterId == userId);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderByDescending(booking => booking.UpdatedAtUtc)
+            .ThenByDescending(booking => booking.CreatedAtUtc)
+            .ThenBy(booking => booking.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new BookingListPage(items, totalCount);
+    }
+
     public async Task<IReadOnlyList<Booking>> ListDeliveredBeforeAsync(
         DateTime deliveredBeforeUtc,
         CancellationToken cancellationToken = default) =>

@@ -37,6 +37,34 @@ export type BookingCreatedResponse = {
     bookingId: string;
 };
 
+export type BookingDto = {
+    id: string;
+    tripListingId: string;
+    deliveryRequestId: null | string;
+    senderId: string;
+    transporterId: string;
+    status: BookingStatus;
+    quotedPriceZar: null | number | string;
+    agreedPriceZar: null | number | string;
+    message: null | string;
+    inTransitAtUtc: null | string;
+    deliveredAtUtc: null | string;
+    completedAtUtc: null | string;
+    cancelledAtUtc: null | string;
+    cancelledByUserId: null | string;
+    createdAtUtc: string;
+    updatedAtUtc: string;
+};
+
+export type BookingPageDto = {
+    items: Array<BookingDto>;
+    page: number | string;
+    pageSize: number | string;
+    totalCount: number | string;
+};
+
+export type BookingStatus = number;
+
 export type BoostedTripDto = {
     id: string;
     transporterProfileId: string;
@@ -924,6 +952,42 @@ export type DeleteApiAuthAccountResponses = {
 
 export type DeleteApiAuthAccountResponse = DeleteApiAuthAccountResponses[keyof DeleteApiAuthAccountResponses];
 
+export type GetApiBookingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        Page?: number | string;
+        PageSize?: number | string;
+    };
+    url: '/api/bookings';
+};
+
+export type GetApiBookingsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse;
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+};
+
+export type GetApiBookingsError = GetApiBookingsErrors[keyof GetApiBookingsErrors];
+
+export type GetApiBookingsResponses = {
+    /**
+     * OK
+     */
+    200: BookingPageDto;
+};
+
+export type GetApiBookingsResponse = GetApiBookingsResponses[keyof GetApiBookingsResponses];
+
 export type PostApiBookingsData = {
     body: CreateBookingRequest;
     path?: never;
@@ -964,6 +1028,41 @@ export type PostApiBookingsResponses = {
 };
 
 export type PostApiBookingsResponse = PostApiBookingsResponses[keyof PostApiBookingsResponses];
+
+export type GetApiBookingsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/bookings/{id}';
+};
+
+export type GetApiBookingsByIdErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+};
+
+export type GetApiBookingsByIdError = GetApiBookingsByIdErrors[keyof GetApiBookingsByIdErrors];
+
+export type GetApiBookingsByIdResponses = {
+    /**
+     * OK
+     */
+    200: BookingDto;
+};
+
+export type GetApiBookingsByIdResponse = GetApiBookingsByIdResponses[keyof GetApiBookingsByIdResponses];
 
 export type PostApiBookingsByIdQuoteData = {
     body: QuoteBookingRequest;
