@@ -37,6 +37,34 @@ export type BookingCreatedResponse = {
     bookingId: string;
 };
 
+export type BookingDto = {
+    id: string;
+    tripListingId: string;
+    deliveryRequestId: null | string;
+    senderId: string;
+    transporterId: string;
+    status: BookingStatus;
+    quotedPriceZar: null | number | string;
+    agreedPriceZar: null | number | string;
+    message: null | string;
+    inTransitAtUtc: null | string;
+    deliveredAtUtc: null | string;
+    completedAtUtc: null | string;
+    cancelledAtUtc: null | string;
+    cancelledByUserId: null | string;
+    createdAtUtc: string;
+    updatedAtUtc: string;
+};
+
+export type BookingPageDto = {
+    items: Array<BookingDto>;
+    page: number | string;
+    pageSize: number | string;
+    totalCount: number | string;
+};
+
+export type BookingStatus = number;
+
 export type BoostedTripDto = {
     id: string;
     transporterProfileId: string;
@@ -193,12 +221,20 @@ export type PublicTransporterProfileDto = {
     averageRating: number | string;
 };
 
+export type PushDeviceTokenDto = {
+    registered: boolean;
+};
+
 export type QuoteBookingRequest = {
     quotedPriceZar: number | string;
 };
 
 export type RefreshRequest = {
     refreshToken: string;
+};
+
+export type RegisterPushDeviceTokenRequest = {
+    deviceToken: string;
 };
 
 export type RegisterRequest = {
@@ -924,6 +960,42 @@ export type DeleteApiAuthAccountResponses = {
 
 export type DeleteApiAuthAccountResponse = DeleteApiAuthAccountResponses[keyof DeleteApiAuthAccountResponses];
 
+export type GetApiBookingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        Page?: number | string;
+        PageSize?: number | string;
+    };
+    url: '/api/bookings';
+};
+
+export type GetApiBookingsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse;
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+};
+
+export type GetApiBookingsError = GetApiBookingsErrors[keyof GetApiBookingsErrors];
+
+export type GetApiBookingsResponses = {
+    /**
+     * OK
+     */
+    200: BookingPageDto;
+};
+
+export type GetApiBookingsResponse = GetApiBookingsResponses[keyof GetApiBookingsResponses];
+
 export type PostApiBookingsData = {
     body: CreateBookingRequest;
     path?: never;
@@ -964,6 +1036,41 @@ export type PostApiBookingsResponses = {
 };
 
 export type PostApiBookingsResponse = PostApiBookingsResponses[keyof PostApiBookingsResponses];
+
+export type GetApiBookingsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/bookings/{id}';
+};
+
+export type GetApiBookingsByIdErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+};
+
+export type GetApiBookingsByIdError = GetApiBookingsByIdErrors[keyof GetApiBookingsByIdErrors];
+
+export type GetApiBookingsByIdResponses = {
+    /**
+     * OK
+     */
+    200: BookingDto;
+};
+
+export type GetApiBookingsByIdResponse = GetApiBookingsByIdResponses[keyof GetApiBookingsByIdResponses];
 
 export type PostApiBookingsByIdQuoteData = {
     body: QuoteBookingRequest;
@@ -1409,6 +1516,39 @@ export type GetApiHealthResponses = {
 
 export type GetApiHealthResponse = GetApiHealthResponses[keyof GetApiHealthResponses];
 
+export type GetApiNotificationsPreferencesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/notifications/preferences';
+};
+
+export type GetApiNotificationsPreferencesErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+};
+
+export type GetApiNotificationsPreferencesError = GetApiNotificationsPreferencesErrors[keyof GetApiNotificationsPreferencesErrors];
+
+export type GetApiNotificationsPreferencesResponses = {
+    /**
+     * OK
+     */
+    200: NotificationPreferencesDto;
+};
+
+export type GetApiNotificationsPreferencesResponse = GetApiNotificationsPreferencesResponses[keyof GetApiNotificationsPreferencesResponses];
+
 export type PutApiNotificationsPreferencesData = {
     body: UpdateNotificationPreferencesRequest;
     path?: never;
@@ -1445,6 +1585,76 @@ export type PutApiNotificationsPreferencesResponses = {
 };
 
 export type PutApiNotificationsPreferencesResponse = PutApiNotificationsPreferencesResponses[keyof PutApiNotificationsPreferencesResponses];
+
+export type PutApiNotificationsDeviceTokenData = {
+    body: RegisterPushDeviceTokenRequest;
+    path?: never;
+    query?: never;
+    url: '/api/notifications/device-token';
+};
+
+export type PutApiNotificationsDeviceTokenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse;
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+};
+
+export type PutApiNotificationsDeviceTokenError = PutApiNotificationsDeviceTokenErrors[keyof PutApiNotificationsDeviceTokenErrors];
+
+export type PutApiNotificationsDeviceTokenResponses = {
+    /**
+     * OK
+     */
+    200: PushDeviceTokenDto;
+};
+
+export type PutApiNotificationsDeviceTokenResponse = PutApiNotificationsDeviceTokenResponses[keyof PutApiNotificationsDeviceTokenResponses];
+
+export type GetApiProfileMeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/profile/me';
+};
+
+export type GetApiProfileMeErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorResponse;
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ErrorResponse;
+};
+
+export type GetApiProfileMeError = GetApiProfileMeErrors[keyof GetApiProfileMeErrors];
+
+export type GetApiProfileMeResponses = {
+    /**
+     * OK
+     */
+    200: TransporterProfileDto;
+};
+
+export type GetApiProfileMeResponse = GetApiProfileMeResponses[keyof GetApiProfileMeResponses];
 
 export type PostApiProfileData = {
     body: CreateProfileRequest;

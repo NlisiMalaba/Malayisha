@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteApiAuthAccountData, DeleteApiAuthAccountErrors, DeleteApiAuthAccountResponses, DeleteApiTripsByIdData, DeleteApiTripsByIdErrors, DeleteApiTripsByIdResponses, GetApiAdminCommissionData, GetApiAdminCommissionErrors, GetApiAdminCommissionResponses, GetApiAdminReviewsData, GetApiAdminReviewsErrors, GetApiAdminReviewsResponses, GetApiAdminVerificationsPendingData, GetApiAdminVerificationsPendingErrors, GetApiAdminVerificationsPendingResponses, GetApiBookingsByIdMessagesData, GetApiBookingsByIdMessagesErrors, GetApiBookingsByIdMessagesResponses, GetApiHealthData, GetApiHealthResponses, GetApiProfileByIdData, GetApiProfileByIdErrors, GetApiProfileByIdResponses, GetApiRequestsData, GetApiRequestsErrors, GetApiRequestsResponses, GetApiReviewsTransporterByIdData, GetApiReviewsTransporterByIdErrors, GetApiReviewsTransporterByIdResponses, GetApiTripsByIdShareLinkData, GetApiTripsByIdShareLinkErrors, GetApiTripsByIdShareLinkResponses, GetApiTripsSearchData, GetApiTripsSearchErrors, GetApiTripsSearchResponses, PostApiAdminBoostsByTripListingIdApplyData, PostApiAdminBoostsByTripListingIdApplyErrors, PostApiAdminBoostsByTripListingIdApplyResponses, PostApiAdminBoostsByTripListingIdRemoveData, PostApiAdminBoostsByTripListingIdRemoveErrors, PostApiAdminBoostsByTripListingIdRemoveResponses, PostApiAdminCommissionByIdInvoiceData, PostApiAdminCommissionByIdInvoiceErrors, PostApiAdminCommissionByIdInvoiceResponses, PostApiAdminCommissionByIdPaidData, PostApiAdminCommissionByIdPaidErrors, PostApiAdminCommissionByIdPaidResponses, PostApiAdminReviewsByIdHideData, PostApiAdminReviewsByIdHideErrors, PostApiAdminReviewsByIdHideResponses, PostApiAdminReviewsByIdRestoreData, PostApiAdminReviewsByIdRestoreErrors, PostApiAdminReviewsByIdRestoreResponses, PostApiAdminVerificationsByIdApproveData, PostApiAdminVerificationsByIdApproveErrors, PostApiAdminVerificationsByIdApproveResponses, PostApiAdminVerificationsByIdRejectData, PostApiAdminVerificationsByIdRejectErrors, PostApiAdminVerificationsByIdRejectResponses, PostApiAuthLoginData, PostApiAuthLoginErrors, PostApiAuthLoginResponses, PostApiAuthRefreshData, PostApiAuthRefreshErrors, PostApiAuthRefreshResponses, PostApiAuthRegisterData, PostApiAuthRegisterErrors, PostApiAuthRegisterResponses, PostApiAuthVerifyOtpData, PostApiAuthVerifyOtpErrors, PostApiAuthVerifyOtpResponses, PostApiBookingsByIdCancelData, PostApiBookingsByIdCancelErrors, PostApiBookingsByIdCancelResponses, PostApiBookingsByIdCompleteData, PostApiBookingsByIdCompleteErrors, PostApiBookingsByIdCompleteResponses, PostApiBookingsByIdConfirmData, PostApiBookingsByIdConfirmErrors, PostApiBookingsByIdConfirmResponses, PostApiBookingsByIdDeliveredData, PostApiBookingsByIdDeliveredErrors, PostApiBookingsByIdDeliveredResponses, PostApiBookingsByIdInTransitData, PostApiBookingsByIdInTransitErrors, PostApiBookingsByIdInTransitResponses, PostApiBookingsByIdQuoteData, PostApiBookingsByIdQuoteErrors, PostApiBookingsByIdQuoteResponses, PostApiBookingsData, PostApiBookingsErrors, PostApiBookingsResponses, PostApiProfileData, PostApiProfileErrors, PostApiProfilePhotoData, PostApiProfilePhotoErrors, PostApiProfilePhotoResponses, PostApiProfileResponses, PostApiRequestsByIdCancelData, PostApiRequestsByIdCancelErrors, PostApiRequestsByIdCancelResponses, PostApiRequestsData, PostApiRequestsErrors, PostApiRequestsResponses, PostApiReviewsData, PostApiReviewsErrors, PostApiReviewsResponses, PostApiTripsData, PostApiTripsErrors, PostApiTripsResponses, PostApiVerificationApplyData, PostApiVerificationApplyErrors, PostApiVerificationApplyResponses, PutApiNotificationsPreferencesData, PutApiNotificationsPreferencesErrors, PutApiNotificationsPreferencesResponses, PutApiProfileData, PutApiProfileErrors, PutApiProfileResponses, PutApiRequestsByIdData, PutApiRequestsByIdErrors, PutApiRequestsByIdResponses, PutApiTripsByIdData, PutApiTripsByIdErrors, PutApiTripsByIdResponses } from './types.gen';
+import type { DeleteApiAuthAccountData, DeleteApiAuthAccountErrors, DeleteApiAuthAccountResponses, DeleteApiTripsByIdData, DeleteApiTripsByIdErrors, DeleteApiTripsByIdResponses, GetApiAdminCommissionData, GetApiAdminCommissionErrors, GetApiAdminCommissionResponses, GetApiAdminReviewsData, GetApiAdminReviewsErrors, GetApiAdminReviewsResponses, GetApiAdminVerificationsPendingData, GetApiAdminVerificationsPendingErrors, GetApiAdminVerificationsPendingResponses, GetApiBookingsByIdData, GetApiBookingsByIdErrors, GetApiBookingsByIdMessagesData, GetApiBookingsByIdMessagesErrors, GetApiBookingsByIdMessagesResponses, GetApiBookingsByIdResponses, GetApiBookingsData, GetApiBookingsErrors, GetApiBookingsResponses, GetApiHealthData, GetApiHealthResponses, GetApiNotificationsPreferencesData, GetApiNotificationsPreferencesErrors, GetApiNotificationsPreferencesResponses, GetApiProfileByIdData, GetApiProfileByIdErrors, GetApiProfileByIdResponses, GetApiProfileMeData, GetApiProfileMeErrors, GetApiProfileMeResponses, GetApiRequestsData, GetApiRequestsErrors, GetApiRequestsResponses, GetApiReviewsTransporterByIdData, GetApiReviewsTransporterByIdErrors, GetApiReviewsTransporterByIdResponses, GetApiTripsByIdShareLinkData, GetApiTripsByIdShareLinkErrors, GetApiTripsByIdShareLinkResponses, GetApiTripsSearchData, GetApiTripsSearchErrors, GetApiTripsSearchResponses, PostApiAdminBoostsByTripListingIdApplyData, PostApiAdminBoostsByTripListingIdApplyErrors, PostApiAdminBoostsByTripListingIdApplyResponses, PostApiAdminBoostsByTripListingIdRemoveData, PostApiAdminBoostsByTripListingIdRemoveErrors, PostApiAdminBoostsByTripListingIdRemoveResponses, PostApiAdminCommissionByIdInvoiceData, PostApiAdminCommissionByIdInvoiceErrors, PostApiAdminCommissionByIdInvoiceResponses, PostApiAdminCommissionByIdPaidData, PostApiAdminCommissionByIdPaidErrors, PostApiAdminCommissionByIdPaidResponses, PostApiAdminReviewsByIdHideData, PostApiAdminReviewsByIdHideErrors, PostApiAdminReviewsByIdHideResponses, PostApiAdminReviewsByIdRestoreData, PostApiAdminReviewsByIdRestoreErrors, PostApiAdminReviewsByIdRestoreResponses, PostApiAdminVerificationsByIdApproveData, PostApiAdminVerificationsByIdApproveErrors, PostApiAdminVerificationsByIdApproveResponses, PostApiAdminVerificationsByIdRejectData, PostApiAdminVerificationsByIdRejectErrors, PostApiAdminVerificationsByIdRejectResponses, PostApiAuthLoginData, PostApiAuthLoginErrors, PostApiAuthLoginResponses, PostApiAuthRefreshData, PostApiAuthRefreshErrors, PostApiAuthRefreshResponses, PostApiAuthRegisterData, PostApiAuthRegisterErrors, PostApiAuthRegisterResponses, PostApiAuthVerifyOtpData, PostApiAuthVerifyOtpErrors, PostApiAuthVerifyOtpResponses, PostApiBookingsByIdCancelData, PostApiBookingsByIdCancelErrors, PostApiBookingsByIdCancelResponses, PostApiBookingsByIdCompleteData, PostApiBookingsByIdCompleteErrors, PostApiBookingsByIdCompleteResponses, PostApiBookingsByIdConfirmData, PostApiBookingsByIdConfirmErrors, PostApiBookingsByIdConfirmResponses, PostApiBookingsByIdDeliveredData, PostApiBookingsByIdDeliveredErrors, PostApiBookingsByIdDeliveredResponses, PostApiBookingsByIdInTransitData, PostApiBookingsByIdInTransitErrors, PostApiBookingsByIdInTransitResponses, PostApiBookingsByIdQuoteData, PostApiBookingsByIdQuoteErrors, PostApiBookingsByIdQuoteResponses, PostApiBookingsData, PostApiBookingsErrors, PostApiBookingsResponses, PostApiProfileData, PostApiProfileErrors, PostApiProfilePhotoData, PostApiProfilePhotoErrors, PostApiProfilePhotoResponses, PostApiProfileResponses, PostApiRequestsByIdCancelData, PostApiRequestsByIdCancelErrors, PostApiRequestsByIdCancelResponses, PostApiRequestsData, PostApiRequestsErrors, PostApiRequestsResponses, PostApiReviewsData, PostApiReviewsErrors, PostApiReviewsResponses, PostApiTripsData, PostApiTripsErrors, PostApiTripsResponses, PostApiVerificationApplyData, PostApiVerificationApplyErrors, PostApiVerificationApplyResponses, PutApiNotificationsDeviceTokenData, PutApiNotificationsDeviceTokenErrors, PutApiNotificationsDeviceTokenResponses, PutApiNotificationsPreferencesData, PutApiNotificationsPreferencesErrors, PutApiNotificationsPreferencesResponses, PutApiProfileData, PutApiProfileErrors, PutApiProfileResponses, PutApiRequestsByIdData, PutApiRequestsByIdErrors, PutApiRequestsByIdResponses, PutApiTripsByIdData, PutApiTripsByIdErrors, PutApiTripsByIdResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -134,6 +134,12 @@ export const deleteApiAuthAccount = <ThrowOnError extends boolean = false>(optio
     ...options
 });
 
+export const getApiBookings = <ThrowOnError extends boolean = false>(options?: Options<GetApiBookingsData, ThrowOnError>): RequestResult<GetApiBookingsResponses, GetApiBookingsErrors, ThrowOnError> => (options?.client ?? client).get<GetApiBookingsResponses, GetApiBookingsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/bookings',
+    ...options
+});
+
 export const postApiBookings = <ThrowOnError extends boolean = false>(options: Options<PostApiBookingsData, ThrowOnError>): RequestResult<PostApiBookingsResponses, PostApiBookingsErrors, ThrowOnError> => (options.client ?? client).post<PostApiBookingsResponses, PostApiBookingsErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/bookings',
@@ -142,6 +148,12 @@ export const postApiBookings = <ThrowOnError extends boolean = false>(options: O
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+export const getApiBookingsById = <ThrowOnError extends boolean = false>(options: Options<GetApiBookingsByIdData, ThrowOnError>): RequestResult<GetApiBookingsByIdResponses, GetApiBookingsByIdErrors, ThrowOnError> => (options.client ?? client).get<GetApiBookingsByIdResponses, GetApiBookingsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/bookings/{id}',
+    ...options
 });
 
 export const postApiBookingsByIdQuote = <ThrowOnError extends boolean = false>(options: Options<PostApiBookingsByIdQuoteData, ThrowOnError>): RequestResult<PostApiBookingsByIdQuoteResponses, PostApiBookingsByIdQuoteErrors, ThrowOnError> => (options.client ?? client).post<PostApiBookingsByIdQuoteResponses, PostApiBookingsByIdQuoteErrors, ThrowOnError>({
@@ -228,6 +240,12 @@ export const postApiRequestsByIdCancel = <ThrowOnError extends boolean = false>(
 
 export const getApiHealth = <ThrowOnError extends boolean = false>(options?: Options<GetApiHealthData, ThrowOnError>): RequestResult<GetApiHealthResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetApiHealthResponses, unknown, ThrowOnError>({ url: '/api/Health', ...options });
 
+export const getApiNotificationsPreferences = <ThrowOnError extends boolean = false>(options?: Options<GetApiNotificationsPreferencesData, ThrowOnError>): RequestResult<GetApiNotificationsPreferencesResponses, GetApiNotificationsPreferencesErrors, ThrowOnError> => (options?.client ?? client).get<GetApiNotificationsPreferencesResponses, GetApiNotificationsPreferencesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/notifications/preferences',
+    ...options
+});
+
 export const putApiNotificationsPreferences = <ThrowOnError extends boolean = false>(options: Options<PutApiNotificationsPreferencesData, ThrowOnError>): RequestResult<PutApiNotificationsPreferencesResponses, PutApiNotificationsPreferencesErrors, ThrowOnError> => (options.client ?? client).put<PutApiNotificationsPreferencesResponses, PutApiNotificationsPreferencesErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/notifications/preferences',
@@ -236,6 +254,22 @@ export const putApiNotificationsPreferences = <ThrowOnError extends boolean = fa
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+export const putApiNotificationsDeviceToken = <ThrowOnError extends boolean = false>(options: Options<PutApiNotificationsDeviceTokenData, ThrowOnError>): RequestResult<PutApiNotificationsDeviceTokenResponses, PutApiNotificationsDeviceTokenErrors, ThrowOnError> => (options.client ?? client).put<PutApiNotificationsDeviceTokenResponses, PutApiNotificationsDeviceTokenErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/notifications/device-token',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const getApiProfileMe = <ThrowOnError extends boolean = false>(options?: Options<GetApiProfileMeData, ThrowOnError>): RequestResult<GetApiProfileMeResponses, GetApiProfileMeErrors, ThrowOnError> => (options?.client ?? client).get<GetApiProfileMeResponses, GetApiProfileMeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/profile/me',
+    ...options
 });
 
 export const postApiProfile = <ThrowOnError extends boolean = false>(options: Options<PostApiProfileData, ThrowOnError>): RequestResult<PostApiProfileResponses, PostApiProfileErrors, ThrowOnError> => (options.client ?? client).post<PostApiProfileResponses, PostApiProfileErrors, ThrowOnError>({

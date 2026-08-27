@@ -6,6 +6,8 @@ using Malayisha.Application.Features.Booking.CancelBooking;
 using Malayisha.Application.Features.Booking.CompleteBooking;
 using Malayisha.Application.Features.Booking.ConfirmBooking;
 using Malayisha.Application.Features.Booking.CreateBooking;
+using Malayisha.Application.Features.Booking.GetBooking;
+using Malayisha.Application.Features.Booking.ListBookings;
 using Malayisha.Application.Features.Booking.MarkDelivered;
 using Malayisha.Application.Features.Booking.MarkInTransit;
 using Malayisha.Application.Features.Booking.QuoteBooking;
@@ -20,6 +22,45 @@ namespace Malayisha.Api.Controllers;
 [Route("api/bookings")]
 public sealed class BookingController(IMediator mediator) : ControllerBase
 {
+    [HttpGet]
+    [Authorize(Policy = AuthPolicies.SenderOrTransporter)]
+    [ProducesResponseType(typeof(BookingPageDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> List(
+        [FromQuery] ListBookingsRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!User.TryGetUserId(out var userId))
+        {
+            return Unauthorized(new ErrorResponse("Unauthorized"));
+        }
+
+        var result = await mediator.Send(
+            new ListBookingsQuery(userId, request.Page, request.PageSize),
+            cancellationToken);
+
+        return BookingResultMapper.ToListResult(result);
+    }
+
+    [HttpGet("{id:guid}")]
+    [Authorize(Policy = AuthPolicies.SenderOrTransporter)]
+    [ProducesResponseType(typeof(BookingDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
+    {
+        if (!User.TryGetUserId(out var userId))
+        {
+            return Unauthorized(new ErrorResponse("Unauthorized"));
+        }
+
+        var result = await mediator.Send(new GetBookingQuery(userId, id), cancellationToken);
+        return BookingResultMapper.ToBookingResult(result);
+    }
+
     [HttpPost]
     [Authorize(Policy = AuthPolicies.SenderOnly)]
     [ProducesResponseType(typeof(BookingCreatedResponse), StatusCodes.Status201Created)]

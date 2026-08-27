@@ -8,6 +8,7 @@ internal static class BookingErrorMapper
         errorCode switch
         {
             BookingErrorCodes.BookingNotFound => StatusCodes.Status404NotFound,
+            BookingErrorCodes.NotBookingParticipant => StatusCodes.Status403Forbidden,
             BookingErrorCodes.TripNotFound => StatusCodes.Status404NotFound,
             BookingErrorCodes.TransporterProfileNotFound => StatusCodes.Status404NotFound,
             BookingErrorCodes.DeliveryRequestNotFound => StatusCodes.Status404NotFound,

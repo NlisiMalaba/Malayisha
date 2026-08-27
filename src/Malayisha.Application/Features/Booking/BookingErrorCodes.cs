@@ -3,6 +3,7 @@ namespace Malayisha.Application.Features.Booking;
 public static class BookingErrorCodes
 {
     public const string BookingNotFound = "BookingNotFound";
+    public const string NotBookingParticipant = "NotBookingParticipant";
     public const string TripNotFound = "TripNotFound";
     public const string TransporterProfileNotFound = "TransporterProfileNotFound";
     public const string DeliveryRequestNotFound = "DeliveryRequestNotFound";

@@ -14,19 +14,35 @@ import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
+import { AuthRole } from '@/constants/auth';
+import { useAuthStore } from '@/stores/auth-store';
 
 export default function AppTabs() {
+  const role = useAuthStore((state) => state.role);
+  const isAdmin = role === AuthRole.Admin;
+
   return (
     <Tabs>
       <TabSlot style={{ height: '100%' }} />
       <TabList asChild>
         <CustomTabList>
           <TabTrigger name="home" href="/" asChild>
-            <TabButton>Home</TabButton>
+            <TabButton>Trips</TabButton>
           </TabTrigger>
-          <TabTrigger name="explore" href="/explore" asChild>
-            <TabButton>Explore</TabButton>
+          <TabTrigger name="requests" href="/requests" asChild>
+            <TabButton>Requests</TabButton>
           </TabTrigger>
+          <TabTrigger name="bookings" href="/bookings" asChild>
+            <TabButton>Bookings</TabButton>
+          </TabTrigger>
+          <TabTrigger name="profile" href="/profile" asChild>
+            <TabButton>Profile</TabButton>
+          </TabTrigger>
+          {isAdmin ? (
+            <TabTrigger name="admin" href="/admin" asChild>
+              <TabButton>Admin</TabButton>
+            </TabTrigger>
+          ) : null}
         </CustomTabList>
       </TabList>
     </Tabs>
@@ -55,7 +71,7 @@ export function CustomTabList(props: TabListProps) {
     <View {...props} style={styles.tabListContainer}>
       <ThemedView type="backgroundElement" style={styles.innerContainer}>
         <ThemedText type="smallBold" style={styles.brandText}>
-          Expo Starter
+          Malayisha
         </ThemedText>
 
         {props.children}
